@@ -1,0 +1,89 @@
+{
+  "name": "material-code",
+  "displayName": "Material Code",
+  "description": "Material dark theme for Visual Studio Code.",
+  "version": "1.0.0",
+  "publisher": "rakib13332",
+  "author": "Rakib",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rakibdev/material-code.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rakibdev/material-code/issues"
+  },
+  "engines": {
+    "vscode": "^1.52.0"
+  },
+  "categories": [
+    "Themes"
+  ],
+  "keywords": [
+    "material",
+    "dark-theme",
+    "color-theme"
+  ],
+  "icon": "./icon.png",
+  "galleryBanner": {
+    "color": "#ffffff",
+    "theme": "light"
+  },
+  "main": "./extension.pack.js",
+  "activationEvents": [
+    "onStartupFinished",
+    "onCommand:material-code.applyStyles",
+    "onCommand:material-code.removeStyles"
+  ],
+  "contributes": {
+    "themes": [
+      {
+        "label": "Material Code",
+        "uiTheme": "vs-dark",
+        "path": "./dark.json"
+      }
+    ],
+    "iconThemes": [
+      {
+        "label": "Material Code",
+        "id": "material-code-icons",
+        "path": "./icon.json"
+      }
+    ],
+    "configuration": {
+      "title": "Material Code",
+      "properties": {
+        "material-code.colorIntensity": {
+          "type": "number",
+          "default": 50,
+          "minimum": 0,
+          "maximum": 100
+        },
+        "material-code.customStyles": {
+          "type": "object",
+          "markdownDescription": "```\n\"material-code.customStyles\": {\n  \".monaco-editor .suggest-widget\": \"border-radius: 10px;\"\n}\n```\n"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "material-code.applyStyles",
+        "title": "Material Code: Apply styles"
+      },
+      {
+        "command": "material-code.removeStyles",
+        "title": "Material Code: Disable styles"
+      }
+    ]
+  },
+  "scripts": {
+    "dev": "esbuild extension.js --bundle --outfile=extension.pack.js --external:vscode --format=cjs --platform=node --watch",
+    "build": "pnpm run dev -- --minify"
+  },
+  "dependencies": {
+    "sudo-prompt": "^9.2.1",
+    "vsce": "^2.6.3"
+  },
+  "devDependencies": {
+    "esbuild": "^0.14.12"
+  }
+}
