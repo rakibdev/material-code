@@ -39,7 +39,8 @@
       {
         "label": "Material Code",
         "uiTheme": "vs-dark",
-        "path": "./dark.json"
+        "path": "./dark.json",
+        "_watch": true
       }
     ],
     "iconThemes": [
@@ -52,11 +53,23 @@
     "configuration": {
       "title": "Material Code",
       "properties": {
-        "material-code.colorIntensity": {
-          "type": "number",
-          "default": 50,
-          "minimum": 0,
-          "maximum": 100
+        "material-code.blueIntensity": {
+          "type": "string",
+          "default": "medium",
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "material-code.lightness": {
+          "type": "string",
+          "default": "medium",
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ]
         },
         "material-code.customStyles": {
           "type": "object",
@@ -77,7 +90,8 @@
   },
   "scripts": {
     "dev": "esbuild extension.js --bundle --outfile=extension.pack.js --external:vscode --format=cjs --platform=node --watch",
-    "build": "pnpm run dev -- --minify"
+    "build": "pnpm run dev -- --minify",
+    "vscode": "code-insiders --extensionDevelopmentPath=/home/rakib/Downloads/material-code --disable-extensions"
   },
   "dependencies": {
     "sudo-prompt": "^9.2.1",

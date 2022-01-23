@@ -17,47 +17,57 @@ const settings = {
   get(section) {
     return vscode.workspace.getConfiguration(section);
   },
-  update(key, value, section) {
-    return settings.get(section).update(key, value, vscode.ConfigurationTarget.Global);
+  update(key, value) {
+    return settings.get().update(key, value, vscode.ConfigurationTarget.Global);
   }
-};
-
-const hexVariant = (hsl, lightness) => {
-  let [h, s, l] = hsl;
-  l = lightness || l;
-  l /= 100;
-  const a = (s * Math.min(l, 1 - l)) / 100;
-  const f = n => {
-    const k = (n + h / 30) % 12;
-    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-    return Math.round(255 * color)
-      .toString(16)
-      .padStart(2, '0');
-  };
-  return `#${f(0)}${f(8)}${f(4)}`;
 };
 
 // todo: secondary button color when visible when deleting a file.
 const updateTheme = async () => {
-  // HSL
-  const primary = [202, 100, 60];
-  const intensity = settings.get('material-code').colorIntensity;
-  const neutral = [primary[0], intensity, primary[2]];
-  const red = [350, 90, 60];
-  const green = [160, 100, 40];
-  const pink = [300, 90, 60];
-  const yellow = [71, 60, 60];
+  const blue_intensity = {
+    high: 80,
+    medium: 50,
+    low: 10
+  };
+  const lightness = {
+    high: 5,
+    medium: 0,
+    low: -5
+  };
+
+  const hexVariant = ([h, s], l) => {
+    l += lightness[settings.get('material-code').lightness];
+
+    l /= 100;
+    const a = (s * Math.min(l, 1 - l)) / 100;
+    const f = n => {
+      const k = (n + h / 30) % 12;
+      const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+      return Math.round(255 * color)
+        .toString(16)
+        .padStart(2, '0');
+    };
+    return `#${f(0)}${f(8)}${f(4)}`;
+  };
+
+  // [hue,saturation]
+  const primary = [202, 100];
+  const neutral = [primary[0], blue_intensity[settings.get('material-code').blueIntensity]];
+  const red = [350, 90];
+  const green = [160, 100];
+  const pink = [300, 90];
+  const yellow = [71, 60];
   const colors = {
-    neutral: hexVariant(neutral),
-    primary: hexVariant(primary),
+    neutral: hexVariant(neutral, 60),
+    primary: hexVariant(primary, 60),
     foreground: hexVariant(neutral, 80),
     background: hexVariant(neutral, 10),
     surface: hexVariant(neutral, 15),
     surface2: hexVariant(neutral, 20),
-    red: hexVariant(red),
-    green: hexVariant(green),
-    pink: hexVariant(pink),
-    yellow: hexVariant(yellow),
+    red: hexVariant(red, 60),
+    green: hexVariant(green, 40),
+    pink: hexVariant(pink, 60),
+    yellow: hexVariant(yellow, 60),
     transparent: '#ffffff00'
   };
   const theme = {
@@ -364,14 +374,17 @@ const updateTheme = async () => {
 
   return fs.writeFile(extension_path + 'dark.json', JSON.stringify(theme));
 };
-
-const reloadWindow = () => {
-  vscode.commands.executeCommand('workbench.action.reloadWindow');
-};
+console.log(Object.keys(vscode));
 
 const updateWorkbenchHtml = async content => {
+  const onUpdated = () => {
+    // todo: apply checksum fix.
+    // && to sudo.exec() multiple commands. https://stackoverflow.com/a/8055444
+    vscode.commands.executeCommand('workbench.action.reloadWindow');
+  };
+
   fs.writeFile(workbench_path, content)
-    .then(reloadWindow)
+    .then(onUpdated)
     .catch(async () => {
       const temp = extension_path + 'workbench.html';
       await fs.writeFile(temp, content);
@@ -386,7 +399,7 @@ const updateWorkbenchHtml = async content => {
             : error.message;
           vscode.window.showErrorMessage(message);
         } else {
-          reloadWindow();
+          onUpdated();
         }
       });
     });
@@ -604,19 +617,19 @@ const activate = async context => {
 
   const commands = [
     vscode.commands.registerCommand('material-code.applyStyles', () => {
-      applyStyles();
       context.globalState.update('styles_enabled', true);
+      applyStyles();
     }),
     vscode.commands.registerCommand('material-code.removeStyles', () => {
-      removeStyles();
       context.globalState.update('styles_enabled', false);
+      removeStyles();
     })
   ];
   commands.forEach(command => context.subscriptions.push(command));
 
   const styles_enabled = context.globalState.get('styles_enabled');
 
-  const first_run = true || typeof styles_enabled != 'boolean';
+  const first_run = typeof styles_enabled != 'boolean';
   if (first_run) {
     enableRecommendedSettings();
     context.globalState.update('styles_enabled', false);
@@ -654,26 +667,13 @@ const activate = async context => {
           }
         });
     }
-    if (event.affectsConfiguration('material-code.colorIntensity')) {
-      await updateTheme();
-      vscode.window
-        .showInformationMessage('Theme updated. Reload window to see changes.', 'Reload')
-        .then(response => {
-          if (response == 'Reload') {
-            vscode.commands.executeCommand('workbench.action.reloadWindow');
-          }
-        });
+    if (
+      event.affectsConfiguration('material-code.blueIntensity') ||
+      event.affectsConfiguration('material-code.lightness')
+    ) {
+      updateTheme();
     }
   });
-
-  // dev mode
-  // const dev_mode = process.argv[2] == 'dev';
-  // console.log(vscode.env.appRoot);
-
-  // await updateTheme();
-  // const theme = JSON.parse(await fs.readFile(extension_path + 'dark.json'));
-  // settings.update('workbench.colorCustomizations', theme.colors);
-  // settings.update('editor.tokenColorCustomizations', { textMateRules: theme.tokenColors });
 };
 
 const deactivate = () => {};
