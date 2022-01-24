@@ -1,3 +1,4 @@
-node_modules
+node_modules/
 pnpm-lock.yaml
 extension.pack.js
+*.vsix

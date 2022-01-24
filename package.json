@@ -23,7 +23,7 @@
     "dark-theme",
     "color-theme"
   ],
-  "icon": "./icon.png",
+  "icon": "icon.png",
   "galleryBanner": {
     "color": "#ffffff",
     "theme": "light"
@@ -89,9 +89,9 @@
     ]
   },
   "scripts": {
-    "dev": "esbuild extension.js --bundle --outfile=extension.pack.js --external:vscode --format=cjs --platform=node --watch",
-    "build": "pnpm run dev -- --minify",
-    "vscode": "code-insiders --extensionDevelopmentPath=/home/rakib/Downloads/material-code --disable-extensions"
+    "dev": "esbuild extension.js --bundle --outfile=extension.pack.js --external:vscode --format=cjs --platform=node",
+    "editor": "code-insiders --extensionDevelopmentPath=/home/rakib/Downloads/material-code --disable-extensions",
+    "release": "pnpm run dev -- --minify && yes | vsce package --yarn && yes | vsce publish --yarn"
   },
   "dependencies": {
     "sudo-prompt": "^9.2.1"
