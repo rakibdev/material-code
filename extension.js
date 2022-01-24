@@ -3,15 +3,13 @@ const path = require('path');
 const fs = require('fs').promises;
 const sudo = require('sudo-prompt');
 
-const windows = /^win/.test(process.platform);
-const formatPath = path => {
-  return windows ? path.replace(/\//g, '\\') : path;
-};
-
-let extension_path = '';
-let workbench_path = formatPath(
-  path.dirname(require.main.filename) + '/vs/code/electron-browser/workbench/workbench.html'
+const app_dir = path.dirname(require.main.filename) + '/';
+const workbench_file = path.normalize(
+  app_dir + 'vs/code/electron-browser/workbench/workbench.html'
 );
+let extension_dir = '';
+
+console.log(workbench_file);
 
 const settings = {
   get(section) {
@@ -372,43 +370,39 @@ const updateTheme = async () => {
     ]
   };
 
-  return fs.writeFile(extension_path + 'dark.json', JSON.stringify(theme));
+  return fs.writeFile(extension_dir + 'dark.json', JSON.stringify(theme));
 };
-console.log(Object.keys(vscode));
 
-const updateWorkbenchHtml = async content => {
+const updateWorkbenchFile = async workbench_content => {
   const onUpdated = () => {
-    // todo: apply checksum fix.
-    // && to sudo.exec() multiple commands. https://stackoverflow.com/a/8055444
     vscode.commands.executeCommand('workbench.action.reloadWindow');
   };
-
-  fs.writeFile(workbench_path, content)
-    .then(onUpdated)
-    .catch(async () => {
-      const temp = extension_path + 'workbench.html';
-      await fs.writeFile(temp, content);
-      const command = windows
-        ? `move "${temp}" "${workbench_path}"`
-        : `mv "${temp}" "${workbench_path}"`;
-      sudo.exec(command, { name: 'Material Code' }, error => {
-        fs.unlink(temp);
-        if (error) {
-          const message = /EPERM|EACCES|ENOENT/.test(error.code)
-            ? 'Permission denied. Run editor as admin and try again.'
-            : error.message;
-          vscode.window.showErrorMessage(message);
-        } else {
-          onUpdated();
-        }
-      });
+  try {
+    await fs.writeFile(workbench_file, workbench_content);
+    onUpdated();
+  } catch (error) {
+    const temp_workbench = extension_dir + 'workbench.html';
+    await fs.writeFile(temp_workbench, workbench_content);
+    const windows = process.platform.includes('win');
+    const command = `${windows ? 'move' : 'mv'} "${temp_workbench}" "${workbench_file}"`;
+    sudo.exec(command, { name: 'Material Code' }, error => {
+      if (error) {
+        fs.unlink(temp_workbench);
+        const message = /EPERM|EACCES|ENOENT/.test(error.code)
+          ? 'Permission denied. Run editor as admin and try again.'
+          : error.message;
+        vscode.window.showErrorMessage(message);
+      } else {
+        onUpdated();
+      }
     });
+  }
 };
 
 const removeStyles = async () => {
-  let html = await fs.readFile(workbench_path, 'utf8');
+  let html = await fs.readFile(workbench_file, 'utf8');
   html = html.replace(/<!--material-code-->.*?<!--material-code-->/s, '');
-  updateWorkbenchHtml(html);
+  updateWorkbenchFile(html);
 };
 
 const applyStyles = async () => {
@@ -416,7 +410,7 @@ const applyStyles = async () => {
   .window-title {
     display: none;
   }
-  
+
   [role=tab] {
     border-radius: 20px 20px 5px 5px;
   }
@@ -588,7 +582,7 @@ const applyStyles = async () => {
   });
   `;
   const code = `<!--material-code--><style>${css}</style><script>${script}</script><!--material-code-->`;
-  let html = await fs.readFile(workbench_path, 'utf8');
+  let html = await fs.readFile(workbench_file, 'utf8');
   html =
     html
       .replace(/<meta http-equiv="Content-Security-Policy".*>/g, '') // allow inline script tag.
@@ -596,7 +590,7 @@ const applyStyles = async () => {
       .replace('</html>', '') +
     code +
     '</html>';
-  updateWorkbenchHtml(html);
+  updateWorkbenchFile(html);
 };
 
 const enableRecommendedSettings = async level => {
@@ -613,7 +607,7 @@ const enableRecommendedSettings = async level => {
 };
 
 const activate = async context => {
-  extension_path = formatPath(context.extensionPath + '/');
+   extension_dir = path.normalize(context.extensionPath + '/');
 
   const commands = [
     vscode.commands.registerCommand('material-code.applyStyles', () => {
@@ -642,7 +636,7 @@ const activate = async context => {
       });
   }
 
-  const html = await fs.readFile(workbench_path, 'utf8');
+  const html = await fs.readFile(workbench_file, 'utf8');
   const injected = html.includes('material-code');
   if (styles_enabled && !injected) {
     vscode.window
@@ -660,7 +654,7 @@ const activate = async context => {
   vscode.workspace.onDidChangeConfiguration(async event => {
     if (event.affectsConfiguration('material-code.customStyles')) {
       vscode.window
-        .showInformationMessage('Custom styles modified. Re-apply styles?', 'Apply')
+        .showInformationMessage('Custom styles setting modified.', 'Apply')
         .then(response => {
           if (response == 'Apply') {
             vscode.commands.executeCommand('material-code.applyStyles');
@@ -682,3 +676,29 @@ module.exports = {
   activate,
   deactivate
 };
+
+/*
+todo: update checksums to fix installation corrupt warning.
+
+const crypto = require('crypto');
+
+const product_file = path.normalize(app_dir + '../product.json');
+
+let product_content = JSON.parse(await fs.readFile(product_file, 'utf8'));
+product_content.checksums['vs/code/electron-browser/workbench/workbench.html'] = crypto
+  .createHash('md5')
+  .update(Buffer.from(workbench_content))
+  .digest('base64')
+  .replace(/=+$/, '');
+product_content = JSON.stringify(product_content, null, '\t');
+
+try {
+  await fs.writeFile(product_file, product_content);
+} catch() {
+  const temp_product = extension_dir + 'product.json';
+  await fs.writeFile(temp_product, product_content);
+  const command = `${windows ? 'move' : 'mv'} "${temp_workbench}" "${workbench_file}" && ${windows ? 'move' : 'mv'
+}
+
+fs.unlink(temp_product);
+*/

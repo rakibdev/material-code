@@ -94,10 +94,10 @@
     "vscode": "code-insiders --extensionDevelopmentPath=/home/rakib/Downloads/material-code --disable-extensions"
   },
   "dependencies": {
-    "sudo-prompt": "^9.2.1",
-    "vsce": "^2.6.3"
+    "sudo-prompt": "^9.2.1"
   },
   "devDependencies": {
-    "esbuild": "^0.14.12"
+    "esbuild": "^0.14.12",
+    "vsce": "^2.6.3"
   }
 }
