@@ -4,3 +4,4 @@ extension.js
 .gitignore
 screenshots/
 *.vsix
+storage.json

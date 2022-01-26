@@ -2,14 +2,30 @@ const vscode = require('vscode');
 const path = require('path');
 const fs = require('fs').promises;
 const sudo = require('sudo-prompt');
+const crypto = require('crypto');
 
 const app_dir = path.dirname(require.main.filename) + '/';
 const workbench_file = path.normalize(
   app_dir + 'vs/code/electron-browser/workbench/workbench.html'
 );
+const product_file = path.normalize(app_dir + '../product.json');
 let extension_dir = '';
 
-console.log(workbench_file);
+const storage = {
+  async get(key) {
+    try {
+      const data = JSON.parse(await fs.readFile(extension_dir + 'storage.json', 'utf8'));
+      return key ? data[key] : data;
+    } catch (error) {
+      return {};
+    }
+  },
+  async set(key, value) {
+    const data = await storage.get();
+    data[key] = value;
+    return fs.writeFile(extension_dir + 'storage.json', JSON.stringify(data));
+  }
+};
 
 const settings = {
   get(section) {
@@ -28,7 +44,7 @@ const updateTheme = async () => {
     low: 10
   };
   const lightness = {
-    high: 5,
+    high: 7,
     medium: 0,
     low: -5
   };
@@ -203,8 +219,8 @@ const updateTheme = async () => {
       'editor.findMatchBackground': colors.primary + 60,
       'editor.findMatchHighlightBackground': colors.primary + 40,
 
-      'editorBracketMatch.background': colors.primary + 30,
-      'editorBracketMatch.border': colors.primary,
+      'editorBracketMatch.background': colors.primary + 60,
+      'editorBracketMatch.border': colors.transparent,
       'editorBracketHighlight.foreground1': colors.pink,
       'editorBracketHighlight.foreground2': colors.yellow,
       'editorBracketHighlight.foreground3': colors.red,
@@ -377,17 +393,32 @@ const updateWorkbenchFile = async workbench_content => {
   const onUpdated = () => {
     vscode.commands.executeCommand('workbench.action.reloadWindow');
   };
+
+  // fixes installation corrupt warning.
+  // requires editor full restart to see effect not only reload window.
+  let product_content = JSON.parse(await fs.readFile(product_file, 'utf8'));
+  product_content.checksums['vs/code/electron-browser/workbench/workbench.html'] = crypto
+    .createHash('md5')
+    .update(Buffer.from(workbench_content))
+    .digest('base64')
+    .replace(/=+$/, '');
+  product_content = JSON.stringify(product_content, null, '\t');
+
   try {
     await fs.writeFile(workbench_file, workbench_content);
+    await fs.writeFile(product_file, product_content);
     onUpdated();
   } catch (error) {
     const temp_workbench = extension_dir + 'workbench.html';
+    const temp_product = extension_dir + 'product.json';
     await fs.writeFile(temp_workbench, workbench_content);
-    const windows = process.platform.includes('win');
-    const command = `${windows ? 'move' : 'mv'} "${temp_workbench}" "${workbench_file}"`;
+    await fs.writeFile(temp_product, product_content);
+    const move_command = process.platform.includes('win') ? 'move' : 'mv';
+    const command = `${move_command} "${temp_workbench}" "${workbench_file}" && ${move_command} "${temp_product}" "${product_file}"`;
     sudo.exec(command, { name: 'Material Code' }, error => {
       if (error) {
         fs.unlink(temp_workbench);
+        fs.unlink(temp_product);
         const message = /EPERM|EACCES|ENOENT/.test(error.code)
           ? 'Permission denied. Run editor as admin and try again.'
           : error.message;
@@ -439,6 +470,7 @@ const applyStyles = async () => {
   
   input,
   select,
+  .monaco-inputbox,
   /* extensions, settings search input */
   .suggest-input-container {
     border-radius: 10px;
@@ -482,6 +514,11 @@ const applyStyles = async () => {
   const styles = settings.get('material-code').customStyles;
   for (const selector in styles) {
     css += selector + '{' + styles[selector] + '}';
+  }
+
+  const font = settings.get('material-code').font;
+  if (font) {
+    css += `.mac, .windows, .linux { font-family: ${font}; }`;
   }
 
   const script = `
@@ -559,7 +596,7 @@ const applyStyles = async () => {
   const onEditorUpdated = () => {
     applyRipple();
 
-    // editor context menu rounded corner, inside shadow root.
+    // editor context menu rounded corner, inject in shadow root.
     const sheet = new CSSStyleSheet();
     sheet.replaceSync('.monaco-menu { border-radius: 30px; }');
     const host = document.querySelector('.shadow-root-host');
@@ -607,38 +644,55 @@ const enableRecommendedSettings = async level => {
 };
 
 const activate = async context => {
-   extension_dir = path.normalize(context.extensionPath + '/');
+  extension_dir = path.normalize(context.extensionPath + '/');
 
   const commands = [
-    vscode.commands.registerCommand('material-code.applyStyles', () => {
-      context.globalState.update('styles_enabled', true);
+    vscode.commands.registerCommand('material-code.applyStyles', async () => {
+      await storage.set('styles_applied', true);
       applyStyles();
     }),
-    vscode.commands.registerCommand('material-code.removeStyles', () => {
-      context.globalState.update('styles_enabled', false);
+    vscode.commands.registerCommand('material-code.removeStyles', async () => {
+      await storage.set('styles_applied', false);
       removeStyles();
     })
   ];
   commands.forEach(command => context.subscriptions.push(command));
 
-  const styles_enabled = context.globalState.get('styles_enabled');
+  /*
+  const extensionUpdated = async () => {
+    if (version != previous_version) {
+      if (typeof previous_version == 'undefined') {
+        onInstall();
+      } else {
+        onUpdate();
+      }
+    }
+    const version = context.extension.packageJSON.version;
+    const last_version = context.globalState.get('version') ?? '';
+    context.globalState.update('version', version);
+    const version_parts = version.split('.');
+    const last_version_parts = last_version.split('.');
+    for (let i = 0; i < version_parts.length; i++) {
+      if (parseInt(version_parts[i]) > parseInt(last_version_parts[i])) return true;
+    }
+  };
+  */
 
-  const first_run = typeof styles_enabled != 'boolean';
-  if (first_run) {
+  const new_installed = typeof (await storage.get('styles_applied')) != 'boolean';
+  if (new_installed) {
+    await storage.set('styles_applied', false);
     enableRecommendedSettings();
-    context.globalState.update('styles_enabled', false);
-    vscode.window
-      .showInformationMessage('Apply styles to get rounded corners, ripple effect?', 'Apply')
-      .then(response => {
-        if (response == 'Apply') {
-          vscode.commands.executeCommand('material-code.applyStyles');
-        }
-      });
+    vscode.window.showInformationMessage('Apply styles?', 'Apply').then(response => {
+      if (response == 'Apply') {
+        vscode.commands.executeCommand('material-code.applyStyles');
+      }
+    });
   }
 
-  const html = await fs.readFile(workbench_file, 'utf8');
-  const injected = html.includes('material-code');
-  if (styles_enabled && !injected) {
+  const workbench_html = await fs.readFile(workbench_file, 'utf8');
+  const styles_applied = await storage.get('styles_applied');
+  const injected = workbench_html.includes('material-code');
+  if (styles_applied && !injected) {
     vscode.window
       .showInformationMessage(
         "Visual Studio Code overwritten extension's applied styles.",
@@ -651,23 +705,29 @@ const activate = async context => {
       });
   }
 
-  vscode.workspace.onDidChangeConfiguration(async event => {
-    if (event.affectsConfiguration('material-code.customStyles')) {
-      vscode.window
-        .showInformationMessage('Custom styles setting modified.', 'Apply')
-        .then(response => {
-          if (response == 'Apply') {
-            vscode.commands.executeCommand('material-code.applyStyles');
-          }
-        });
-    }
+  vscode.workspace.onDidChangeConfiguration(event => {
     if (
       event.affectsConfiguration('material-code.blueIntensity') ||
       event.affectsConfiguration('material-code.lightness')
     ) {
       updateTheme();
     }
+    if (
+      event.affectsConfiguration('material-code.font') ||
+      event.affectsConfiguration('material-code.customStyles')
+    ) {
+      vscode.window
+        .showInformationMessage('Style related setting modified.', 'Apply')
+        .then(response => {
+          if (response == 'Apply') {
+            vscode.commands.executeCommand('material-code.applyStyles');
+          }
+        });
+    }
   });
+
+  // dev
+  // updateTheme();
 };
 
 const deactivate = () => {};
@@ -676,29 +736,3 @@ module.exports = {
   activate,
   deactivate
 };
-
-/*
-todo: update checksums to fix installation corrupt warning.
-
-const crypto = require('crypto');
-
-const product_file = path.normalize(app_dir + '../product.json');
-
-let product_content = JSON.parse(await fs.readFile(product_file, 'utf8'));
-product_content.checksums['vs/code/electron-browser/workbench/workbench.html'] = crypto
-  .createHash('md5')
-  .update(Buffer.from(workbench_content))
-  .digest('base64')
-  .replace(/=+$/, '');
-product_content = JSON.stringify(product_content, null, '\t');
-
-try {
-  await fs.writeFile(product_file, product_content);
-} catch() {
-  const temp_product = extension_dir + 'product.json';
-  await fs.writeFile(temp_product, product_content);
-  const command = `${windows ? 'move' : 'mv'} "${temp_workbench}" "${workbench_file}" && ${windows ? 'move' : 'mv'
-}
-
-fs.unlink(temp_product);
-*/

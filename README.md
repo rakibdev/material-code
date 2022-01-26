@@ -10,9 +10,9 @@ Leave your suggestion or issues [Github](https://github.com/rakibdev/material-co
 
 ## Usage
 
-Theme works straight away. For additional styling like rounded corners select `"Material Code: Apply styles"` from command palette. To disable select `"Material Code: Disable styles"`.
+Theme works straight away. For additional styling like rounded corners select `"Material Code: Apply styles"` from command palette. To remove select `"Material Code: Remove styles"`.
 
-Extension may ask for administrative privileges when applying or disabling styles. After applying editor may show notification `"Installation corrupted"`, select `"Don't show again"`.
+Extension may ask for administrative privileges when applying or removing styles. After applying editor may show notification `"Installation corrupted"`, select `"Don't show again"`.
 
 Extension will ask to re-apply styles when necessary like everytime when Visual Studio Code updates or when modifying custom styles in settings.
 

@@ -2,7 +2,7 @@
   "name": "material-code",
   "displayName": "Material Code",
   "description": "Material dark theme for Visual Studio Code.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "publisher": "rakib13332",
   "author": "Rakib",
   "repository": {
@@ -43,13 +43,6 @@
         "_watch": true
       }
     ],
-    "iconThemes": [
-      {
-        "label": "Material Code",
-        "id": "material-code-icons",
-        "path": "./icon.json"
-      }
-    ],
     "configuration": {
       "title": "Material Code",
       "properties": {
@@ -71,9 +64,13 @@
             "low"
           ]
         },
+        "material-code.font": {
+          "type": "string",
+          "description": "Customize font family of whole UI."
+        },
         "material-code.customStyles": {
           "type": "object",
-          "markdownDescription": "```\n\"material-code.customStyles\": {\n  \".monaco-editor .suggest-widget\": \"border-radius: 10px;\"\n}\n```\n"
+          "markdownDescription": "```\n\"material-code.customStyles\": {\n  \".mac, .windows, .linux\": \"font-family: SF Mono;\"\n}\n```\n"
         }
       }
     },
@@ -84,14 +81,15 @@
       },
       {
         "command": "material-code.removeStyles",
-        "title": "Material Code: Disable styles"
+        "title": "Material Code: Remove styles"
       }
     ]
   },
   "scripts": {
     "dev": "esbuild extension.js --bundle --outfile=extension.pack.js --external:vscode --format=cjs --platform=node",
     "editor": "code-insiders --extensionDevelopmentPath=/home/rakib/Downloads/material-code --disable-extensions",
-    "release": "pnpm run dev -- --minify && yes | vsce package --yarn && yes | vsce publish --yarn"
+    "package": "pnpm run dev -- --minify && yes | vsce package --yarn",
+    "release": "pnpm run package && yes | vsce publish --yarn"
   },
   "dependencies": {
     "sudo-prompt": "^9.2.1"
