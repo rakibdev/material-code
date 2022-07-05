@@ -1,14 +1,15 @@
-const vscode = require('vscode');
-const path = require('path');
-const fs = require('fs').promises;
-const sudo = require('sudo-prompt');
-const crypto = require('crypto');
+import vscode from 'vscode';
+import path from 'path';
+import sudo from 'sudo-prompt';
+import crypto from 'crypto';
+import { promises as fs } from 'fs';
+import { Hct, argbFromHex, hexFromArgb } from '@material/material-color-utilities';
 
-const app_dir = path.dirname(require.main.filename) + '/';
+const app_dir = path.dirname(require.main.filename);
 const workbench_file = path.normalize(
-  app_dir + 'vs/code/electron-browser/workbench/workbench.html'
+  app_dir + '/vs/code/electron-browser/workbench/workbench.html'
 );
-const product_file = path.normalize(app_dir + '../product.json');
+const product_file = path.normalize(app_dir + '/../product.json');
 let extension_dir = '';
 
 const storage = {
@@ -28,62 +29,53 @@ const storage = {
 };
 
 const settings = {
-  get(section) {
-    return vscode.workspace.getConfiguration(section);
-  },
-  update(key, value) {
-    return settings.get().update(key, value, vscode.ConfigurationTarget.Global);
+  get(key) {
+    return vscode.workspace.getConfiguration('material-code')[key];
   }
+  // update(key, value) {
+  //   return settings.get().update(key, value, vscode.ConfigurationTarget.Global);
+  // }
 };
 
-// todo: secondary button color when visible when deleting a file.
+// todo: secondary button color when visible while deleting a file.
 const updateTheme = async () => {
-  const blue_intensity = {
-    high: 80,
-    medium: 50,
-    low: 10
+  const colorfulness = {
+    high: 40,
+    medium: 20,
+    low: 8
   };
-  const lightness = {
-    high: 7,
+  const brightness = {
+    high: 3,
     medium: 0,
-    low: -5
+    low: -3
   };
 
-  const hexVariant = ([h, s], l) => {
-    l += lightness[settings.get('material-code').lightness];
-
-    l /= 100;
-    const a = (s * Math.min(l, 1 - l)) / 100;
-    const f = n => {
-      const k = (n + h / 30) % 12;
-      const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-      return Math.round(255 * color)
-        .toString(16)
-        .padStart(2, '0');
-    };
-    return `#${f(0)}${f(8)}${f(4)}`;
+  const hexTone = (hct, tone) => {
+    const shift = brightness[settings.get('brightness')];
+    return hexFromArgb(Hct.from(hct.hue, hct.chroma, tone + shift).toInt());
   };
 
-  // [hue,saturation]
-  const primary = [202, 100];
-  const neutral = [primary[0], blue_intensity[settings.get('material-code').blueIntensity]];
-  const red = [350, 90];
-  const green = [160, 100];
-  const pink = [300, 90];
-  const yellow = [71, 60];
+  const primary = Hct.fromInt(argbFromHex('#00adff'));
+  const red = Hct.fromInt(argbFromHex('#ff002b'));
+  const green = Hct.fromInt(argbFromHex('#00ffac'));
+  const pink = Hct.fromInt(argbFromHex('#ff00bb'));
+  const yellow = Hct.fromInt(argbFromHex('#fff700'));
+  const neutral = Hct.from(primary.hue, colorfulness[settings.get('colorfulness')], primary.tone);
+
   const colors = {
-    neutral: hexVariant(neutral, 60),
-    primary: hexVariant(primary, 60),
-    foreground: hexVariant(neutral, 80),
-    background: hexVariant(neutral, 10),
-    surface: hexVariant(neutral, 15),
-    surface2: hexVariant(neutral, 20),
-    red: hexVariant(red, 60),
-    green: hexVariant(green, 40),
-    pink: hexVariant(pink, 60),
-    yellow: hexVariant(yellow, 60),
+    neutral: hexTone(neutral, 60),
+    primary: hexTone(primary, 60),
+    foreground: hexTone(neutral, 80),
+    background: hexTone(neutral, 5),
+    surface: hexTone(neutral, 10),
+    surface2: hexTone(neutral, 16),
+    red: hexTone(red, 60),
+    green: hexTone(green, 60),
+    pink: hexTone(pink, 60),
+    yellow: hexTone(yellow, 70),
     transparent: '#ffffff00'
   };
+
   const theme = {
     name: 'Material Code',
     type: 'dark',
@@ -96,9 +88,9 @@ const updateTheme = async () => {
       'widget.shadow': colors.transparent,
       'sash.hoverBorder': colors.transparent,
 
-      'button.background': hexVariant(primary, 30),
-      'button.foreground': hexVariant(primary, 90),
-      'button.secondaryForeground': hexVariant(primary, 90),
+      'button.background': hexTone(primary, 70),
+      'button.foreground': hexTone(primary, 10),
+      'button.secondaryForeground': hexTone(primary, 70),
       'button.secondaryBackground': colors.transparent,
 
       'checkbox.background': colors.transparent,
@@ -109,9 +101,9 @@ const updateTheme = async () => {
 
       'input.background': colors.surface,
       'input.placeholderForeground': colors.neutral,
-      'inputOption.activeBackground': hexVariant(primary, 30),
-      'inputOption.activeForeground': hexVariant(primary, 90),
-      'inputValidation.errorForeground': hexVariant(red, 10),
+      'inputOption.activeBackground': hexTone(primary, 70),
+      'inputOption.activeForeground': hexTone(primary, 10),
+      'inputValidation.errorForeground': hexTone(red, 10),
       'inputValidation.errorBorder': colors.transparent,
 
       'inputValidation.errorBackground': colors.red,
@@ -121,8 +113,8 @@ const updateTheme = async () => {
       'scrollbarSlider.hoverBackground': colors.surface2,
       'scrollbarSlider.activeBackground': colors.surface2,
 
-      'badge.background': hexVariant(primary, 30),
-      'badge.foreground': hexVariant(primary, 90),
+      'badge.background': hexTone(primary, 70),
+      'badge.foreground': hexTone(primary, 10),
 
       'list.hoverBackground': colors.surface2,
       'list.activeSelectionBackground': colors.surface2,
@@ -225,10 +217,10 @@ const updateTheme = async () => {
       'editorBracketHighlight.foreground2': colors.yellow,
       'editorBracketHighlight.foreground3': colors.red,
       'editorBracketHighlight.foreground4': colors.green,
-      'editorBracketPairGuide.activeBackground1': hexVariant(pink, 30),
-      'editorBracketPairGuide.activeBackground2': hexVariant(yellow, 30),
-      'editorBracketPairGuide.activeBackground3': hexVariant(red, 30),
-      'editorBracketPairGuide.activeBackground4': hexVariant(green, 30),
+      'editorBracketPairGuide.activeBackground1': hexTone(pink, 30),
+      'editorBracketPairGuide.activeBackground2': hexTone(yellow, 30),
+      'editorBracketPairGuide.activeBackground3': hexTone(red, 30),
+      'editorBracketPairGuide.activeBackground4': hexTone(green, 30),
 
       'editorIndentGuide.activeBackground': colors.surface,
       'editorIndentGuide.background': colors.transparent,
@@ -251,8 +243,8 @@ const updateTheme = async () => {
       'peekViewTitleDescription.foreground': colors.foreground,
       'peekViewEditor.matchHighlightBackground': colors.primary + 40,
       'peekViewResult.matchHighlightBackground': colors.primary + 40,
-      'peekViewResult.selectionBackground': hexVariant(primary, 30),
-      'peekViewResult.selectionForeground': hexVariant(primary, 90),
+      'peekViewResult.selectionBackground': hexTone(primary, 70),
+      'peekViewResult.selectionForeground': hexTone(primary, 10),
       'peekViewResult.lineForeground': colors.foreground,
 
       'notificationCenterHeader.background': colors.surface2,
@@ -281,19 +273,16 @@ const updateTheme = async () => {
     },
     tokenColors: [
       {
-        scope: ['comment', 'punctuation.definition.comment'],
-        settings: {
-          foreground: colors.neutral
-        }
-      },
-      {
         scope: [
           '',
           'punctuation',
           'keyword',
           'keyword.other.unit',
           'constant.other',
-          'support.constant'
+          'support.constant',
+
+          'comment',
+          'punctuation.definition.comment'
         ],
         settings: {
           foreground: colors.neutral
@@ -315,6 +304,7 @@ const updateTheme = async () => {
           'keyword.operator.new.js',
           'keyword.operator.expression.typeof.js',
           'keyword.operator.expression.instanceof.js',
+          'keyword.operator.expression.import.js',
           'string.other'
         ],
         settings: {
@@ -335,7 +325,7 @@ const updateTheme = async () => {
           'punctuation.definition.block.close.end.vue'
         ],
         settings: {
-          foreground: hexVariant(primary, 50)
+          foreground: colors.primary
         }
       },
       {
@@ -354,7 +344,7 @@ const updateTheme = async () => {
           'keyword.operator.event-handler-shorthand.vue-html'
         ],
         settings: {
-          foreground: colors.primary
+          foreground: hexTone(primary, 70)
         }
       },
       {
@@ -368,7 +358,7 @@ const updateTheme = async () => {
           'keyword.other'
         ],
         settings: {
-          foreground: hexVariant(red, 70)
+          foreground: colors.red
         }
       },
       {
@@ -395,13 +385,14 @@ const updateWorkbenchFile = async workbench_content => {
   };
 
   // fixes installation corrupt warning.
-  // requires editor full restart to see effect not only reload window.
+  // requires editor full restart to see effect not just reload window.
   let product_content = JSON.parse(await fs.readFile(product_file, 'utf8'));
-  product_content.checksums['vs/code/electron-browser/workbench/workbench.html'] = crypto
-    .createHash('md5')
-    .update(Buffer.from(workbench_content))
-    .digest('base64')
-    .replace(/=+$/, '');
+  product_content.checksums[path.normalize('vs/code/electron-browser/workbench/workbench.html')] =
+    crypto
+      .createHash('md5')
+      .update(Buffer.from(workbench_content))
+      .digest('base64')
+      .replace(/=+$/, '');
   product_content = JSON.stringify(product_content, null, '\t');
 
   try {
@@ -453,18 +444,18 @@ const applyStyles = async () => {
   .editor-widget, /* find widget */
   .menubar-menu-button, /* title bar menu buttons */
   .notifications-center {
-    border-radius: 30px;
+    border-radius: 20px;
   }
   
   /* icon button */
   .codicon {
-    border-radius: 30px !important;
+    border-radius: 20px !important;
   }
-  
+
   .monaco-editor .suggest-widget, /* autocomplete */
   .quick-input-widget, /* command pallete */
   .notification-toast {
-    border-radius: 30px;
+    border-radius: 20px;
     overflow: hidden;
   }
   
@@ -511,12 +502,11 @@ const applyStyles = async () => {
     -webkit-mask-image: radial-gradient(closest-side, #fff 65%, transparent);
   }
   `;
-  const styles = settings.get('material-code').customStyles;
-  for (const selector in styles) {
-    css += selector + '{' + styles[selector] + '}';
+  const custom = settings.get('customCSS');
+  for (const selector in custom) {
+    css += selector + '{' + custom[selector] + '}';
   }
-
-  const font = settings.get('material-code').font;
+  const font = settings.get('font');
   if (font) {
     css += `.mac, .windows, .linux { font-family: ${font}; }`;
   }
@@ -622,25 +612,12 @@ const applyStyles = async () => {
   let html = await fs.readFile(workbench_file, 'utf8');
   html =
     html
-      .replace(/<meta http-equiv="Content-Security-Policy".*>/g, '') // allow inline script tag.
+      .replace(/<meta http-equiv="Content-Security-Policy".*>/g, '') // allows running inline script tag.
       .replace(/<!--material-code-->.*?<!--material-code-->/s, '')
       .replace('</html>', '') +
     code +
     '</html>';
   updateWorkbenchFile(html);
-};
-
-const enableRecommendedSettings = async level => {
-  settings.update('editor.bracketPairColorization.enabled', true);
-  settings.update('editor.guides.bracketPairs', true);
-
-  if (level == 'all') {
-    // todo:
-    // settings.update('editor.cursorBlinking', 'solid');
-    // settings.update('workbench.activityBar.visible', false);
-    // settings.update('mdb.sendTelemetry', false);
-    // settings.update('telemetry.telemetryLevel', 'off');
-  }
 };
 
 const activate = async context => {
@@ -681,12 +658,16 @@ const activate = async context => {
   const new_installed = typeof (await storage.get('styles_applied')) != 'boolean';
   if (new_installed) {
     await storage.set('styles_applied', false);
-    enableRecommendedSettings();
-    vscode.window.showInformationMessage('Apply styles?', 'Apply').then(response => {
-      if (response == 'Apply') {
-        vscode.commands.executeCommand('material-code.applyStyles');
-      }
-    });
+    vscode.window
+      .showInformationMessage(
+        'Inject styles to get rounded corners, ripple effect and more? This will modify installation files.',
+        'Apply'
+      )
+      .then(action => {
+        if (action == 'Apply') {
+          vscode.commands.executeCommand('material-code.applyStyles');
+        }
+      });
   }
 
   const workbench_html = await fs.readFile(workbench_file, 'utf8');
@@ -695,11 +676,11 @@ const activate = async context => {
   if (styles_applied && !injected) {
     vscode.window
       .showInformationMessage(
-        "Visual Studio Code overwritten extension's applied styles.",
+        "Visual Studio Code overwritten extension's injected styles.",
         'Re-apply'
       )
-      .then(response => {
-        if (response == 'Re-apply') {
+      .then(action => {
+        if (action == 'Re-apply') {
           vscode.commands.executeCommand('material-code.applyStyles');
         }
       });
@@ -707,27 +688,24 @@ const activate = async context => {
 
   vscode.workspace.onDidChangeConfiguration(event => {
     if (
-      event.affectsConfiguration('material-code.blueIntensity') ||
-      event.affectsConfiguration('material-code.lightness')
+      event.affectsConfiguration('material-code.colorfulness') ||
+      event.affectsConfiguration('material-code.brightness')
     ) {
       updateTheme();
     }
+
     if (
       event.affectsConfiguration('material-code.font') ||
-      event.affectsConfiguration('material-code.customStyles')
+      event.affectsConfiguration('material-code.customCSS')
     ) {
-      vscode.window
-        .showInformationMessage('Style related setting modified.', 'Apply')
-        .then(response => {
-          if (response == 'Apply') {
-            vscode.commands.executeCommand('material-code.applyStyles');
-          }
-        });
+      vscode.window.showInformationMessage('Style settings changed.', 'Apply').then(action => {
+        if (action == 'Apply') vscode.commands.executeCommand('material-code.applyStyles');
+      });
     }
   });
 
-  // dev
-  // updateTheme();
+  // "reload extension host" to see effect.
+  if (process.env.DEV_MODE) updateTheme();
 };
 
 const deactivate = () => {};

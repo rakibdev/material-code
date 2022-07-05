@@ -1,8 +1,8 @@
 {
   "name": "material-code",
   "displayName": "Material Code",
-  "description": "Material dark theme for Visual Studio Code.",
-  "version": "1.1.0",
+  "description": "Dark theme for Visual Studio Code.",
+  "version": "2.0.0",
   "publisher": "rakib13332",
   "author": "Rakib",
   "repository": {
@@ -20,8 +20,7 @@
   ],
   "keywords": [
     "material",
-    "dark-theme",
-    "color-theme"
+    "dark-theme"
   ],
   "icon": "icon.png",
   "galleryBanner": {
@@ -46,7 +45,7 @@
     "configuration": {
       "title": "Material Code",
       "properties": {
-        "material-code.blueIntensity": {
+        "material-code.colorfulness": {
           "type": "string",
           "default": "medium",
           "enum": [
@@ -55,7 +54,7 @@
             "low"
           ]
         },
-        "material-code.lightness": {
+        "material-code.brightness": {
           "type": "string",
           "default": "medium",
           "enum": [
@@ -68,9 +67,9 @@
           "type": "string",
           "description": "Customize font family of whole UI."
         },
-        "material-code.customStyles": {
+        "material-code.customCSS": {
           "type": "object",
-          "markdownDescription": "```\n\"material-code.customStyles\": {\n  \".mac, .windows, .linux\": \"font-family: SF Mono;\"\n}\n```\n"
+          "markdownDescription": "```\n\"material-code.customCSS\": {\n  \".mac, .windows, .linux\": \"font-family: SF Mono;\"\n}\n```\n"
         }
       }
     },
@@ -86,16 +85,16 @@
     ]
   },
   "scripts": {
-    "dev": "esbuild extension.js --bundle --outfile=extension.pack.js --external:vscode --format=cjs --platform=node",
-    "editor": "code-insiders --extensionDevelopmentPath=/home/rakib/Downloads/material-code --disable-extensions",
-    "package": "pnpm run dev -- --minify && yes | vsce package --yarn",
-    "release": "pnpm run package && yes | vsce publish --yarn"
+    "build": "esbuild extension.js --bundle --outfile=extension.pack.js --external:vscode --format=cjs --platform=node",
+    "dev": "export DEV_MODE=true && code-insiders --extensionDevelopmentPath=/home/rakib/Downloads/material-code && pnpm run build --watch",
+    "release": "pnpm run build --minify && yes | vsce package --yarn && yes | vsce publish --yarn"
   },
   "dependencies": {
+    "@material/material-color-utilities": "^0.1.2",
     "sudo-prompt": "^9.2.1"
   },
   "devDependencies": {
-    "esbuild": "^0.14.12",
-    "vsce": "^2.6.3"
+    "esbuild": "^0.14.48",
+    "vsce": "^2.9.2"
   }
 }
