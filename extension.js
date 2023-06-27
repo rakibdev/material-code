@@ -37,15 +37,15 @@ const settings = {
 const updateWorkbenchFile = async workbench_html => {
   const onSuccess = () => {
     vscode.commands.executeCommand('workbench.action.reloadWindow')
-      }
+  }
 
   // updates checksums to fix installation corrupt warning.
   // requires editor full restart to see effect not just reload window.
   let product_json = JSON.parse(await fs.readFile(product_file, 'utf8'))
   product_json.checksums[workbench_file_relative] = crypto
-      .createHash('md5')
+    .createHash('md5')
     .update(Buffer.from(workbench_html))
-      .digest('base64')
+    .digest('base64')
     .replace(/=+$/, '')
   product_json = JSON.stringify(product_json, null, '\t')
 
@@ -72,8 +72,8 @@ const updateWorkbenchFile = async workbench_html => {
         })
       } else onSuccess()
     })
-      }
   }
+}
 
 const removeInjectedCode = workbench_html => workbench_html.replace(/<!--material-code-->.*?<!--material-code-->/s, '')
 
@@ -87,11 +87,11 @@ const applyStyles = async () => {
   body {
     --radius: 20px;
   }
-
+  
   [role=tab] {
     border-radius: 20px 20px 8px 8px;
   }
-
+  
   [role=button],
   [role=tooltip],
   [role=dialog],
@@ -206,7 +206,7 @@ const applyStyles = async () => {
     container.className = 'ripple-container'
     container.appendChild(ripple)
     element.appendChild(container)
-    
+  
     const ripple_animation = ripple.animate({ transform: ['scale(0.1)', 'scale(1)'] }, 400)
     const hideRipple = async () => {
       removeListeners(element, 'pointerup pointerleave', hideRipple)
@@ -221,7 +221,7 @@ const applyStyles = async () => {
     }
     addListeners(element, 'pointerup pointerleave', hideRipple)
   }
-
+  
   const findParent = (element, selector) => {
     const max_depth = 5
     let count = 0
@@ -229,7 +229,7 @@ const applyStyles = async () => {
       if (element.matches(selector)) return element
       element = element.parentElement
       if (++count > max_depth) return
-      }
+    }
   }
 
   const applyContextMenuStyles = () => {
@@ -242,7 +242,7 @@ const applyStyles = async () => {
   document.body.addEventListener('pointerdown', event => {
     const mouse_right_click = event.button == 2
     if (mouse_right_click) return setTimeout(applyContextMenuStyles, 30)
-
+    
     const ripple_element = findParent(
       event.target,
       '[role=button], [role=tab], [role=listitem], [role=treeitem], [role=menuitem], [role=option], .scrollbar > .slider'
@@ -262,7 +262,7 @@ const applyStyles = async () => {
       `<!--material-code--><style>${css}</style><script>${script}</script><!--material-code-->\n</html>`
     )
   updateWorkbenchFile(html)
-  }
+}
 
 const isNewVersion = (current, previous) => {
   current = current.split('.')
@@ -270,7 +270,7 @@ const isNewVersion = (current, previous) => {
   for (let i = 0; i < current.length; i++) {
     if (parseInt(current[i]) > parseInt(previous[i])) return true
   }
-    }
+}
 
 module.exports.activate = async context => {
   await storage.initialize(context)
@@ -293,25 +293,25 @@ module.exports.activate = async context => {
     storage.set('version', package_version)
     if (version) {
       if (isNewVersion(package_version, version)) {
-    vscode.window
-      .showInformationMessage(
+        vscode.window
+          .showInformationMessage(
             `Material Code was updated from v${version} to v${package_version}!`,
             'Open changelog'
-      )
-      .then(action => {
+          )
+          .then(action => {
             if (action == 'Open changelog') return '' // todo: open github releases page
           })
-        }
+      }
     } else {
-    vscode.window
-      .showInformationMessage(
+      vscode.window
+        .showInformationMessage(
           'Material Code is installed! Apply styles from command palette to get rounded corners, ripple effect.',
           ['Open GitHub README']
-      )
-      .then(action => {
+        )
+        .then(action => {
           if (action == 'Open GitHub README') return '' // todo: open github readme page
         })
-        }
+    }
   }
 
   const workbench_html = await fs.readFile(workbench_file, 'utf8')
@@ -323,7 +323,7 @@ module.exports.activate = async context => {
       .then(action => {
         if (action == 'Re-apply') vscode.commands.executeCommand('material-code.applyStyles')
       })
-    }
-    }
+  }
+}
 
 module.exports.deactivate = () => {}
