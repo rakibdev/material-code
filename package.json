@@ -5,33 +5,28 @@
   "version": "2.0.0",
   "publisher": "rakib13332",
   "author": "Rakib",
+  "icon": "icon.png",
+  "galleryBanner.color": "#ffffff",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rakibdev/material-code.git"
+    "url": "https://github.com/rakibdev/material-code"
   },
   "bugs": {
     "url": "https://github.com/rakibdev/material-code/issues"
-  },
-  "engines": {
-    "vscode": "^1.52.0"
   },
   "categories": [
     "Themes"
   ],
   "keywords": [
     "material",
-    "dark-theme"
+    "dark theme"
   ],
-  "icon": "icon.png",
-  "galleryBanner": {
-    "color": "#ffffff",
-    "theme": "light"
-  },
   "main": "./extension.pack.js",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
   "activationEvents": [
-    "onStartupFinished",
-    "onCommand:material-code.applyStyles",
-    "onCommand:material-code.removeStyles"
+    "onStartupFinished"
   ],
   "contributes": {
     "themes": [
@@ -90,11 +85,11 @@
     "release": "pnpm run build --minify && yes | vsce package --yarn && yes | vsce publish --yarn"
   },
   "dependencies": {
-    "@material/material-color-utilities": "^0.1.2",
+    "@material/material-color-utilities": "^0.2.5",
     "sudo-prompt": "^9.2.1"
   },
   "devDependencies": {
-    "esbuild": "^0.14.48",
-    "vsce": "^2.9.2"
+    "esbuild": "^0.17.17",
+    "vsce": "^2.15.0"
   }
 }
