@@ -68,7 +68,7 @@
   },
   "dependencies": {
     "@material/material-color-utilities": "^0.2.5",
-    "sudo-prompt": "^9.2.1"
+    "@vscode/sudo-prompt": "^9.3.1"
   },
   "devDependencies": {
     "esbuild": "^0.17.17",

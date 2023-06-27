@@ -1,16 +1,13 @@
-import vscode from 'vscode';
-import path from 'path';
-import sudo from 'sudo-prompt';
-import crypto from 'crypto';
-import { promises as fs } from 'fs';
-import { Hct, argbFromHex, hexFromArgb } from '@material/material-color-utilities';
+import vscode from 'vscode'
+import sudo from '@vscode/sudo-prompt'
+import path from 'path'
+import crypto from 'crypto'
+import { promises as fs } from 'fs'
 
-const app_dir = path.dirname(require.main.filename);
-const workbench_file = path.normalize(
-  app_dir + '/vs/code/electron-browser/workbench/workbench.html'
-);
-const product_file = path.normalize(app_dir + '/../product.json');
-let extension_dir = '';
+const app_dir = path.dirname(require.main.filename)
+const workbench_file = path.normalize(app_dir + '/vs/code/electron-sandbox/workbench/workbench.html')
+const workbench_file_relative = path.normalize('vs/code/electron-sandbox/workbench/workbench.html')
+const product_file = path.normalize(app_dir + '/../product.json')
 
 const storage = {
   dir: '',
@@ -33,59 +30,57 @@ const storage = {
 
 const settings = {
   get(key) {
-    return vscode.workspace.getConfiguration('material-code')[key];
+    return vscode.workspace.getConfiguration('material-code')[key]
   }
-  // update(key, value) {
-  //   return settings.get().update(key, value, vscode.ConfigurationTarget.Global);
-  // }
-};
+}
 
+const updateWorkbenchFile = async workbench_html => {
   const onSuccess = () => {
     vscode.commands.executeCommand('workbench.action.reloadWindow')
       }
 
-  // fixes installation corrupt warning.
+  // updates checksums to fix installation corrupt warning.
   // requires editor full restart to see effect not just reload window.
-  let product_content = JSON.parse(await fs.readFile(product_file, 'utf8'));
-  product_content.checksums[path.normalize('vs/code/electron-browser/workbench/workbench.html')] =
-    crypto
+  let product_json = JSON.parse(await fs.readFile(product_file, 'utf8'))
+  product_json.checksums[workbench_file_relative] = crypto
       .createHash('md5')
-      .update(Buffer.from(workbench_content))
+    .update(Buffer.from(workbench_html))
       .digest('base64')
-      .replace(/=+$/, '');
-  product_content = JSON.stringify(product_content, null, '\t');
+    .replace(/=+$/, '')
+  product_json = JSON.stringify(product_json, null, '\t')
 
   try {
-    await fs.writeFile(workbench_file, workbench_content);
-    await fs.writeFile(product_file, product_content);
-    onUpdated();
+    await fs.writeFile(workbench_file, workbench_html)
+    await fs.writeFile(product_file, product_json)
+    onSuccess()
   } catch (error) {
     const temp_workbench = storage.dir + 'workbench.html'
     const temp_product = storage.dir + 'product.json'
-    await fs.writeFile(temp_workbench, workbench_content);
-    await fs.writeFile(temp_product, product_content);
-    const move_command = process.platform.includes('win') ? 'move' : 'mv';
-    const command = `${move_command} "${temp_workbench}" "${workbench_file}" && ${move_command} "${temp_product}" "${product_file}"`;
+    await fs.writeFile(temp_workbench, workbench_html)
+    await fs.writeFile(temp_product, product_json)
+    const move_command = process.platform.includes('win') ? 'move' : 'mv'
+    const command = `${move_command} "${temp_workbench}" "${workbench_file}" && ${move_command} "${temp_product}" "${product_file}"`
     sudo.exec(command, { name: 'Material Code' }, error => {
       if (error) {
-        fs.unlink(temp_workbench);
-        fs.unlink(temp_product);
+        fs.unlink(temp_workbench)
+        fs.unlink(temp_product)
         const message = /EPERM|EACCES|ENOENT/.test(error.code)
           ? 'Permission denied. Run editor as admin and try again.'
-          : error.message;
-        vscode.window.showErrorMessage(message);
-      } else {
-        onUpdated();
+          : error.message
+        vscode.window.showErrorMessage(message, 'Report on GitHub').then(async action => {
+          if (action == 'Report on GitHub') return '' // todo: create issue with prefilled text
+        })
+      } else onSuccess()
+    })
       }
-    });
   }
-};
+
+const removeInjectedCode = workbench_html => workbench_html.replace(/<!--material-code-->.*?<!--material-code-->/s, '')
 
 const removeStyles = async () => {
-  let html = await fs.readFile(workbench_file, 'utf8');
-  html = html.replace(/<!--material-code-->.*?<!--material-code-->/s, '');
-  updateWorkbenchFile(html);
-};
+  const html = await fs.readFile(workbench_file, 'utf8')
+  updateWorkbenchFile(removeInjectedCode(html))
+}
 
 const applyStyles = async () => {
   let css = `
@@ -268,6 +263,15 @@ const applyStyles = async () => {
     }
   })
   `
+
+  let html = await fs.readFile(workbench_file, 'utf8')
+  html = removeInjectedCode(html)
+    .replace(/<meta.*http-equiv="Content-Security-Policy".*?>/s, '')
+    .replace(
+      '</html>',
+      `<!--material-code--><style>${css}</style><script>${script}</script><!--material-code-->\n</html>`
+    )
+  updateWorkbenchFile(html)
   }
 
   let timeout = null;
@@ -283,15 +287,15 @@ module.exports.activate = async context => {
 
   const commands = [
     vscode.commands.registerCommand('material-code.applyStyles', async () => {
-      await storage.set('styles_applied', true);
-      applyStyles();
+      await storage.set('styles_enabled', true)
+      applyStyles()
     }),
     vscode.commands.registerCommand('material-code.removeStyles', async () => {
-      await storage.set('styles_applied', false);
-      removeStyles();
+      await storage.set('styles_enabled', false)
+      removeStyles()
     })
-  ];
-  commands.forEach(command => context.subscriptions.push(command));
+  ]
+  commands.forEach(command => context.subscriptions.push(command))
 
   /*
   const extensionUpdated = async () => {
