@@ -297,55 +297,31 @@ module.exports.activate = async context => {
   ]
   commands.forEach(command => context.subscriptions.push(command))
 
-  /*
-  const extensionUpdated = async () => {
-    if (version != previous_version) {
-      if (typeof previous_version == 'undefined') {
-        onInstall();
-      } else {
-        onUpdate();
-      }
-    }
-    const version = context.extension.packageJSON.version;
-    const last_version = context.globalState.get('version') ?? '';
-    context.globalState.update('version', version);
-    const version_parts = version.split('.');
-    const last_version_parts = last_version.split('.');
-    for (let i = 0; i < version_parts.length; i++) {
-      if (parseInt(version_parts[i]) > parseInt(last_version_parts[i])) return true;
-    }
-  };
-  */
-
-  const new_installed = typeof (await storage.get('styles_applied')) != 'boolean';
-  if (new_installed) {
-    await storage.set('styles_applied', false);
+  const version = storage.get().version
+  const package_version = context.extension.packageJSON.version
+  if (version != package_version) {
+    storage.set('version', package_version)
+    if (version) {
+      if (isNewVersion(package_version, version)) {
     vscode.window
       .showInformationMessage(
-        'Inject styles to get rounded corners, ripple effect and more? This will modify installation files.',
-        'Apply'
+            `Material Code was updated from v${version} to v${package_version}!`,
+            'Open changelog'
       )
       .then(action => {
-        if (action == 'Apply') {
-          vscode.commands.executeCommand('material-code.applyStyles');
+            if (action == 'Open changelog') return '' // todo: open github releases page
+          })
         }
-      });
-  }
-
-  const workbench_html = await fs.readFile(workbench_file, 'utf8');
-  const styles_applied = await storage.get('styles_applied');
-  const injected = workbench_html.includes('material-code');
-  if (styles_applied && !injected) {
+    } else {
     vscode.window
       .showInformationMessage(
-        "Visual Studio Code overwritten extension's injected styles.",
-        'Re-apply'
+          'Material Code is installed! Apply styles from command palette to get rounded corners, ripple effect.',
+          ['Open GitHub README']
       )
       .then(action => {
-        if (action == 'Re-apply') {
-          vscode.commands.executeCommand('material-code.applyStyles');
+          if (action == 'Open GitHub README') return '' // todo: open github readme page
+        })
         }
-      });
   }
 
   const workbench_html = await fs.readFile(workbench_file, 'utf8')
