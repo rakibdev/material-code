@@ -89,26 +89,22 @@ const applyStyles = async () => {
   }
 
   [role=tab] {
-    border-radius: 20px 20px 5px 5px;
+    border-radius: 20px 20px 8px 8px;
   }
 
   [role=button],
   [role=tooltip],
   [role=dialog],
   .monaco-menu,
-  .editor-widget, /* find widget */
+  .editor-widget, /* find & replace */
   .menubar-menu-button, /* title bar menu buttons */
   .notifications-center {
     border-radius: var(--radius) !important;
   }
   
-  /* icon button */
-  .codicon {
-    border-radius: 20px !important;
-  }
-
+  .monaco-menu-container,
   .monaco-editor .suggest-widget, /* autocomplete */
-  .quick-input-widget, /* command pallete */
+  .quick-input-widget, /* command palette */
   .notification-toast {
     border-radius: var(--radius) !important;
     overflow: hidden;
@@ -121,8 +117,7 @@ const applyStyles = async () => {
   
   input,
   select,
-  .monaco-inputbox,
-  /* extensions, settings search input */
+  .monaco-inputbox, /* extensions, settings search input */
   .suggest-input-container {
     border-radius: 10px;
     padding-left: 8px;
@@ -161,15 +156,10 @@ const applyStyles = async () => {
     position: absolute;
     -webkit-mask-image: radial-gradient(closest-side, #fff 65%, transparent);
   }
-  `;
-  const custom = settings.get('customCSS');
-  for (const selector in custom) {
-    css += selector + '{' + custom[selector] + '}';
-  }
-  const font = settings.get('font');
-  if (font) {
-    css += `.mac, .windows, .linux { font-family: ${font}; }`;
-  }
+  `
+  // todo: custom css usage link
+  const custom_css = settings.get('customCSS')
+  if (custom_css) css += custom_css
 
   const script = `
   const addListeners = (element, events, func, options = {}) => {
