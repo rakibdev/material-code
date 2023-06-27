@@ -1,5 +1,6 @@
 node_modules/
-pnpm-lock.yaml
-extension.pack.js
+bun.lockb
+.vscode
 *.vsix
-storage.json
+
+extension.pack.js

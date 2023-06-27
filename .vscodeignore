@@ -1,7 +1,9 @@
 node_modules/
-pnpm-lock.yaml
-extension.js
-.gitignore
-screenshots/
+bun.lockb
+.vscode
 *.vsix
-storage.json
+
+.gitignore
+extension.js
+create-theme.js
+screenshots/

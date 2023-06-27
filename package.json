@@ -33,8 +33,12 @@
       {
         "label": "Material Code",
         "uiTheme": "vs-dark",
-        "path": "./dark.json",
-        "_watch": true
+        "path": "./themes/dark.json"
+      },
+      {
+        "label": "Material Code Darker",
+        "uiTheme": "vs-dark",
+        "path": "./themes/darker.json"
       }
     ],
     "configuration": {
@@ -58,9 +62,9 @@
     ]
   },
   "scripts": {
-    "build": "esbuild extension.js --bundle --outfile=extension.pack.js --external:vscode --format=cjs --platform=node",
-    "dev": "export DEV_MODE=true && code-insiders --extensionDevelopmentPath=/home/rakib/Downloads/material-code && pnpm run build --watch",
-    "release": "pnpm run build --minify && yes | vsce package --yarn && yes | vsce publish --yarn"
+    "build": "bun create-themes.js && esbuild extension.js --bundle --outfile=extension.pack.js --external:vscode --format=cjs --platform=node",
+    "dev": "bun run build && code-insiders --disable-extensions --extensionDevelopmentPath=/home/rakib/Downloads/material-code",
+    "release": "bun run build --minify && yes | vsce package && yes | vsce publish"
   },
   "dependencies": {
     "@material/material-color-utilities": "^0.2.5",
