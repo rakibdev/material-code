@@ -620,25 +620,8 @@ const applyStyles = async () => {
       clearTimeout(timeout);
       setTimeout(onEditorUpdated, 800);
     }
-  });
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
-  `;
-  const code = `<!--material-code--><style>${css}</style><script>${script}</script><!--material-code-->`;
-  let html = await fs.readFile(workbench_file, 'utf8');
-  html =
-    html
-      .replace(/<meta http-equiv="Content-Security-Policy".*>/g, '') // allows running inline script tag.
-      .replace(/<!--material-code-->.*?<!--material-code-->/s, '')
-      .replace('</html>', '') +
-    code +
-    '</html>';
-  updateWorkbenchFile(html);
-};
 
-const activate = async context => {
+module.exports.activate = async context => {
   await storage.initialize(context)
 
   const commands = [
@@ -704,31 +687,16 @@ const activate = async context => {
       });
   }
 
-  vscode.workspace.onDidChangeConfiguration(event => {
-    if (
-      event.affectsConfiguration('material-code.colorfulness') ||
-      event.affectsConfiguration('material-code.brightness')
-    ) {
-      updateTheme();
+  const workbench_html = await fs.readFile(workbench_file, 'utf8')
+  const code_injected = workbench_html.includes('material-code')
+  const styles_enabled = storage.get('styles_enabled')
+  if (styles_enabled && !code_injected) {
+    vscode.window
+      .showInformationMessage("Visual Studio Code update reverted Material Code's styles.", 'Re-apply')
+      .then(action => {
+        if (action == 'Re-apply') vscode.commands.executeCommand('material-code.applyStyles')
+      })
+    }
     }
 
-    if (
-      event.affectsConfiguration('material-code.font') ||
-      event.affectsConfiguration('material-code.customCSS')
-    ) {
-      vscode.window.showInformationMessage('Style settings changed.', 'Apply').then(action => {
-        if (action == 'Apply') vscode.commands.executeCommand('material-code.applyStyles');
-      });
-    }
-  });
-
-  // "reload extension host" to see effect.
-  if (process.env.DEV_MODE) updateTheme();
-};
-
-const deactivate = () => {};
-
-module.exports = {
-  activate,
-  deactivate
-};
+module.exports.deactivate = () => {}

@@ -40,31 +40,9 @@
     "configuration": {
       "title": "Material Code",
       "properties": {
-        "material-code.colorfulness": {
-          "type": "string",
-          "default": "medium",
-          "enum": [
-            "high",
-            "medium",
-            "low"
-          ]
-        },
-        "material-code.brightness": {
-          "type": "string",
-          "default": "medium",
-          "enum": [
-            "high",
-            "medium",
-            "low"
-          ]
-        },
-        "material-code.font": {
-          "type": "string",
-          "description": "Customize font family of whole UI."
-        },
         "material-code.customCSS": {
-          "type": "object",
-          "markdownDescription": "```\n\"material-code.customCSS\": {\n  \".mac, .windows, .linux\": \"font-family: SF Mono;\"\n}\n```\n"
+          "type": "string",
+          "markdownDescription": "Run `Material Code: Apply styles` from command palette to see effect."
         }
       }
     },
