@@ -274,12 +274,12 @@ const applyStyles = async () => {
   updateWorkbenchFile(html)
   }
 
-  let timeout = null;
-  const observer = new MutationObserver(mutations => {
-    const nodes_added = mutations.some(mutation => mutation.addedNodes.length);
-    if (nodes_added) {
-      clearTimeout(timeout);
-      setTimeout(onEditorUpdated, 800);
+const isNewVersion = (current, previous) => {
+  current = current.split('.')
+  previous = previous.split('.')
+  for (let i = 0; i < current.length; i++) {
+    if (parseInt(current[i]) > parseInt(previous[i])) return true
+  }
     }
 
 module.exports.activate = async context => {
