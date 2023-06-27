@@ -13,20 +13,23 @@ const product_file = path.normalize(app_dir + '/../product.json');
 let extension_dir = '';
 
 const storage = {
-  async get(key) {
+  dir: '',
+  data: {},
+  async initialize(extension_context) {
+    storage.dir = path.normalize(extension_context.globalStorageUri.path + '/')
+    await fs.mkdir(storage.dir, { recursive: true })
     try {
-      const data = JSON.parse(await fs.readFile(extension_dir + 'storage.json', 'utf8'));
-      return key ? data[key] : data;
-    } catch (error) {
-      return {};
-    }
+      storage.data = JSON.parse(await fs.readFile(storage.dir + 'storage.json', 'utf8'))
+    } catch {}
   },
-  async set(key, value) {
-    const data = await storage.get();
-    data[key] = value;
-    return fs.writeFile(extension_dir + 'storage.json', JSON.stringify(data));
+  get(key) {
+    return key ? storage.data[key] : storage.data
+  },
+  set(key, value) {
+    storage.data[key] = value
+    return fs.writeFile(storage.dir + 'storage.json', JSON.stringify(storage.data))
   }
-};
+}
 
 const settings = {
   get(key) {
@@ -400,8 +403,8 @@ const updateWorkbenchFile = async workbench_content => {
     await fs.writeFile(product_file, product_content);
     onUpdated();
   } catch (error) {
-    const temp_workbench = extension_dir + 'workbench.html';
-    const temp_product = extension_dir + 'product.json';
+    const temp_workbench = storage.dir + 'workbench.html'
+    const temp_product = storage.dir + 'product.json'
     await fs.writeFile(temp_workbench, workbench_content);
     await fs.writeFile(temp_product, product_content);
     const move_command = process.platform.includes('win') ? 'move' : 'mv';
@@ -636,7 +639,7 @@ const applyStyles = async () => {
 };
 
 const activate = async context => {
-  extension_dir = path.normalize(context.extensionPath + '/');
+  await storage.initialize(context)
 
   const commands = [
     vscode.commands.registerCommand('material-code.applyStyles', async () => {
