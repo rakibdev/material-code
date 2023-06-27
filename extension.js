@@ -429,8 +429,8 @@ const removeStyles = async () => {
 
 const applyStyles = async () => {
   let css = `
-  .window-title {
-    display: none;
+  body {
+    --radius: 20px;
   }
 
   [role=tab] {
@@ -444,7 +444,7 @@ const applyStyles = async () => {
   .editor-widget, /* find widget */
   .menubar-menu-button, /* title bar menu buttons */
   .notifications-center {
-    border-radius: 20px;
+    border-radius: var(--radius) !important;
   }
   
   /* icon button */
@@ -455,8 +455,13 @@ const applyStyles = async () => {
   .monaco-editor .suggest-widget, /* autocomplete */
   .quick-input-widget, /* command pallete */
   .notification-toast {
-    border-radius: 20px;
+    border-radius: var(--radius) !important;
     overflow: hidden;
+  }
+  
+  /* icon button */
+  .codicon {
+    border-radius: var(--radius);
   }
   
   input,
