@@ -64,7 +64,7 @@
   "scripts": {
     "build": "bun create-themes.js && esbuild extension.js --bundle --outfile=extension.pack.js --external:vscode --format=cjs --platform=node",
     "dev": "bun run build && code-insiders --disable-extensions --extensionDevelopmentPath=/home/rakib/Downloads/material-code",
-    "release": "bun run build --minify && yes | vsce package && yes | vsce publish"
+    "release": "bun run build --minify && bun github-release.js && vsce package && vsce publish"
   },
   "dependencies": {
     "@material/material-color-utilities": "^0.2.5",
