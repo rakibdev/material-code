@@ -1,5 +1,9 @@
 import { spawnSync } from 'child_process'
 
+const green = '\x1b[32m'
+const red = '\x1b[31m'
+const reset = '\x1b[0m'
+
 const execute = command => {
   command = command.split(/\s+/)
   return spawnSync(command[0], command.slice(1), { encoding: 'utf8' }).stdout
@@ -10,26 +14,41 @@ const tags = execute('git tag -l --sort=-v:refname')
   .flatMap(tag => (tag ? tag.trim() : []))
 const last_tag = tags[0]
 const last_commit = last_tag ? `${execute(`git rev-list -1 ${last_tag}`).trim()}..HEAD` : 'HEAD'
-const new_commits = execute(`git log --format=%s__%h__%an ${last_commit}`)
+const new_commits = execute(`git log --format=%s__%h ${last_commit}`)
   .split('\n')
-  .map(commit => {
-    const [message, short_hash, author] = commit.split('__')
-    return { message, short_hash, author }
+  .flatMap(commit => {
+    if (!commit) return []
+    const [message, short_hash] = commit.split('__')
+    return { message, short_hash }
   })
-const getCommitsBulletedMarkdown = prefixes => {
+if (!new_commits.length) {
+  console.log(red + `No new commits since tag ${last_tag}` + reset)
+  process.exit(1)
+}
+
+const getCommitsBulletedMarkdown = (prefixes, prefix_emojis) => {
   const relevent = new_commits.filter(commit => prefixes.some(prefix => commit.message.startsWith(prefix)))
   relevent.sort((commit, commit2) => {
     const index = prefixes.findIndex(prefix => commit.message.startsWith(prefix))
     const index2 = prefixes.findIndex(prefix => commit2.message.startsWith(prefix))
     return index - index2
   })
-  return relevent.map(commit => `* ${commit.message} ${commit.short_hash} by @${commit.author}`).join('\n')
+  return relevent
+    .map(commit => {
+      const index = prefixes.findIndex(prefix => commit.message.startsWith(prefix))
+      return `${commit.message.replace(`${prefixes[index]}:`, prefix_emojis[index])} ${commit.short_hash}`
+    })
+    .join('\n')
 }
 
+const features = getCommitsBulletedMarkdown(['feat'], ['✨'])
+const improvements = getCommitsBulletedMarkdown(
+  ['refactor!', 'refactor', 'perf', 'chore', 'docs', 'style'],
+  ['♻️!', '♻️', '⚡', '🔧', '📄', '🌈']
+)
+const fixes = getCommitsBulletedMarkdown(['fix'], ['🐞'])
+
 let release_notes = []
-const features = getCommitsBulletedMarkdown(['feat'])
-const improvements = getCommitsBulletedMarkdown(['refactor!', 'refactor', 'perf', 'chore', 'docs'])
-const fixes = getCommitsBulletedMarkdown(['fix'])
 if (features.length) release_notes.push(`## New features\n${features}`)
 if (improvements.length) release_notes.push(`## Improvements\n${improvements}`)
 if (fixes.length) release_notes.push(`## Fixes\n${fixes}`)
@@ -59,8 +78,5 @@ const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/rele
     body: release_notes
   })
 })
-const green = '\x1b[32m'
-const red = '\x1b[31m'
-const reset = '\x1b[0m'
-if (response.ok) console.log(green + `Released v${version}.` + reset + `\n\n${release_notes}`)
-else console.log(red + `Failed to release v${version}.` + reset)
+if (response.ok) console.log(green + `Released v${version}.` + `\n\n${release_notes}` + reset)
+else console.log(red + `Failed to create release v${version}.` + reset)
