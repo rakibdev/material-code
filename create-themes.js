@@ -323,8 +323,8 @@ const createTheme = (name, brightness, colorfulness = 16) => {
   return theme
 }
 
-fs.writeFile('themes/dark.json', JSON.stringify(createTheme('Material Code', 0)))
-fs.writeFile('themes/darker.json', JSON.stringify(createTheme('Material Code Darker', -4)))
+fs.writeFile('themes/dark.json', JSON.stringify(createTheme('Material Code', -2)))
+fs.writeFile('themes/darker.json', JSON.stringify(createTheme('Material Code Darker', -6)))
 
 // todo
 // {
