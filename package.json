@@ -39,6 +39,11 @@
     "configuration": {
       "title": "Material Code",
       "properties": {
+        "material-code.primaryColor": {
+          "type": "string",
+          "default": "#00adff",
+          "description": "Use 6 digit hex color."
+        },
         "material-code.customCSS": {
           "type": "string",
           "markdownDescription": "Run `Material Code: Apply styles` from command palette to see effect."
@@ -57,13 +62,14 @@
     ]
   },
   "scripts": {
-    "build": "bun create-themes.js && esbuild extension.js --bundle --outfile=extension.pack.js --external:vscode --format=cjs --platform=node",
-    "dev": "bun run build && code-insiders --disable-extensions --extensionDevelopmentPath=/home/rakib/Downloads/material-code",
+    "editor": "code-insiders --extensionDevelopmentPath=/home/rakib/Downloads/material-code",
+    "dev": "export dev=true && bun theme.js --watch",
+    "build": "esbuild extension.js --bundle --outfile=extension.pack.js --external:vscode --format=cjs --platform=node",
     "release": "bun run build --minify && bun github-release.js && vsce package && vsce publish"
   },
   "dependencies": {
-    "@material/material-color-utilities": "^0.2.5",
-    "@vscode/sudo-prompt": "^9.3.1"
+    "@material/material-color-utilities": "^0.2.7",
+    "@vscode/sudo-prompt": "^9.3.1",
   },
   "devDependencies": {
     "esbuild": "^0.17.17",

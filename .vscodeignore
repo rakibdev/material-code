@@ -1,9 +1,7 @@
 node_modules/
 bun.lockb
-.vscode
 *.vsix
 
 .gitignore
 extension.js
-create-theme.js
 screenshots/

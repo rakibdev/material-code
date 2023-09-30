@@ -3,10 +3,10 @@ import sudo from '@vscode/sudo-prompt'
 import path from 'path'
 import crypto from 'crypto'
 import { promises as fs } from 'fs'
+import { createTheme } from './theme.js'
 
 const app_dir = path.dirname(require.main.filename)
 const workbench_file = path.normalize(app_dir + '/vs/code/electron-sandbox/workbench/workbench.html')
-const workbench_file_relative = path.normalize('vs/code/electron-sandbox/workbench/workbench.html')
 const product_file = path.normalize(app_dir + '/../product.json')
 
 const storage = {
@@ -42,6 +42,7 @@ const updateWorkbenchFile = async workbench_html => {
   // updates checksums to fix installation corrupt warning.
   // requires editor full restart to see effect not just reload window.
   let product_json = JSON.parse(await fs.readFile(product_file, 'utf8'))
+  const workbench_file_relative = path.slice(1)
   product_json.checksums[workbench_file_relative] = crypto
     .createHash('md5')
     .update(Buffer.from(workbench_html))
@@ -157,7 +158,6 @@ const applyStyles = async () => {
     -webkit-mask-image: radial-gradient(closest-side, #fff 65%, transparent);
   }
   `
-  // todo: custom css usage link
   const custom_css = settings.get('customCSS')
   if (custom_css) css += custom_css
 
@@ -299,18 +299,18 @@ module.exports.activate = async context => {
             'Open changelog'
           )
           .then(action => {
-            if (action == 'Open changelog') return '' // todo: open github releases page
+            if (action == 'Open changelog') {
+              const releases = `${context.extension.packageJSON.repository.url}/releases`
+              vscode.env.openExternal(vscode.Uri.parse(releases))
+            }
           })
       }
     } else {
-      vscode.window
-        .showInformationMessage(
-          'Material Code is installed! Apply styles from command palette to get rounded corners, ripple effect.',
-          ['Open GitHub README']
-        )
-        .then(action => {
-          if (action == 'Open GitHub README') return '' // todo: open github readme page
-        })
+      vscode.window.showInformationMessage('Material Code is installed!', ['Open GitHub README']).then(action => {
+        if (action == 'Open GitHub README') {
+          vscode.env.openExternal(vscode.Uri.parse(context.extension.packageJSON.repository.url))
+        }
+      })
     }
   }
 
@@ -318,12 +318,24 @@ module.exports.activate = async context => {
   const code_injected = workbench_html.includes('material-code')
   const styles_enabled = storage.get('styles_enabled')
   if (styles_enabled && !code_injected) {
-    vscode.window
-      .showInformationMessage("Visual Studio Code update reverted Material Code's styles.", 'Re-apply')
-      .then(action => {
-        if (action == 'Re-apply') vscode.commands.executeCommand('material-code.applyStyles')
-      })
+    vscode.window.showInformationMessage("An update reverted Material Code's styles.", 'Re-apply').then(action => {
+      if (action == 'Re-apply') vscode.commands.executeCommand('material-code.applyStyles')
+    })
   }
+
+  vscode.workspace.onDidChangeConfiguration(event => {
+    if (event.affectsConfiguration('material-code.primaryColor')) {
+      const color = settings.get('primaryColor')
+      const hexValid = /^#?([A-Fa-f0-9]{6})$/.test(color)
+      if (hexValid) {
+        createTheme({
+          path: context.extensionPath + '/themes/dark.json',
+          dark: true,
+          primary: color
+        })
+      }
+    }
+  })
 }
 
 module.exports.deactivate = () => {}

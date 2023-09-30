@@ -1,6 +1,5 @@
 node_modules/
 bun.lockb
-.vscode
 *.vsix
 
 extension.pack.js
