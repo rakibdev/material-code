@@ -34,11 +34,6 @@
         "label": "Material Code",
         "uiTheme": "vs-dark",
         "path": "./themes/dark.json"
-      },
-      {
-        "label": "Material Code Darker",
-        "uiTheme": "vs-dark",
-        "path": "./themes/darker.json"
       }
     ],
     "configuration": {
