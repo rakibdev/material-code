@@ -5,4 +5,5 @@ bun.lockb
 .gitignore
 extension.js
 theme.js
+github-release.js
 screenshots/
