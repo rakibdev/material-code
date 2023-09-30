@@ -1,19 +1,54 @@
 ## Features
 
-- Blue-grey dark theme. Adjust brightness, colorfulness in settings.
-- Rounded corners for buttons, menus, tabs, dialogs, text selection and more.
-- Android 12 ripple effect.
-- Add custom CSS styles in settings.
-- Auto enables recommended settings like bracket pair colorization.
+- Material You.
+- Rounded corners.
+- Ripple effect.
+- Custom CSS.
 
-Leave your suggestion or issues [Github](https://github.com/rakibdev/material-code)
+![Material Code Editor](https://raw.githubusercontent.com/rakibdev/material-code/main/screenshots/editor.png)
+![Material Code Settings](https://raw.githubusercontent.com/rakibdev/material-code/main/screenshots/settings.png)
+
+> Apple's `SF Mono` font used in screenshots.
+
+Let me know your suggestions or issues in [Github](https://github.com/rakibdev/material-code)
 
 ## Usage
 
-Theme works straight away. For additional styling like rounded corners select `"Material Code: Apply styles"` from command palette. This will modify editor installtion files. Extension may ask for administrative privileges when applying or removing styles. After applying editor can show notification `"Installation corrupted"`, select `"Don't show again"`.
+Theme works straight away.
 
-Extension will ask to re-apply styles when necessary like everytime when Visual Studio Code updates or when modifying custom styles in settings. To remove styles select `"Material Code: Remove styles"` from command palette.
+Additional styling (Rounded corners, ripple effect custom CSS) requires running `"Material Code: Apply styles"` from command palette, which injects custom code into vscode installation files `workbench.html` and `product.json`. Therefore extension may ask for administrative privileges everytime you do this or you can manually run vscode as administrator once.
 
-![Material Code Editor](https://raw.githubusercontent.com/rakibdev/material-code/main/screenshots/editor.png)
-![Material Code Editor Group](https://raw.githubusercontent.com/rakibdev/material-code/main/screenshots/editor-group.png)
-![Material Code Settings](https://raw.githubusercontent.com/rakibdev/material-code/main/screenshots/settings.png)
+After applied vscode will show `"Installation corrupted"` notification. This can be safely ignored. Click notification gear icon > `Don't show again`.
+
+To remove styles run `"Material Code: Remove styles"` from command palette which reverts those files to original.
+
+## Help
+
+### Revert original files manually
+
+In rare cases like [this](https://github.com/rakibdev/material-code/issues/2) where `"Material Code: Remove styles"` not working. Generally updating vscode version will revert itself including the styles. But if you need fix urgent:
+
+- Open `workbench.html` file located in vscode installation folder.
+  In my case it's `/opt/visual-studio-code-insiders/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html`
+- Remove all code inside `<!--material-code-->` and save.
+- To revert `product.json` which fixes `Installation corrupted` warning, use [Fix VSCode Checksums](https://marketplace.visualstudio.com/items?itemName=lehni.vscode-fix-checksums) extension.
+
+### Custom CSS samples
+
+Change whole UI font
+
+`"material-code.customCSS": ".mac, .windows, .linux { font-family: Google Sans; }"`
+
+Change round radius
+
+`"material-code.customCSS": "body { --radius: 8px; }"`
+
+### Settings you may like
+
+`"editor.semanticHighlighting.enabled": true`
+
+`"window.dialogStyle": "custom"`
+
+`"window.menuBarVisibility": "hidden"` (Command palette can do everything top menu does)
+
+My [settings.json](https://github.com/rakibdev/dotfiles/blob/main/home/rakib/.config/Code - Insiders/User/settings.json) file.

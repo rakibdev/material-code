@@ -46,7 +46,7 @@
         },
         "material-code.customCSS": {
           "type": "string",
-          "markdownDescription": "Run `Material Code: Apply styles` from command palette to see effect."
+          "markdownDescription": "Run `Material Code: Apply styles` from command palette after editing."
         }
       }
     },
@@ -69,10 +69,10 @@
   },
   "dependencies": {
     "@material/material-color-utilities": "^0.2.7",
-    "@vscode/sudo-prompt": "^9.3.1",
+    "@vscode/sudo-prompt": "^9.3.1"
   },
   "devDependencies": {
-    "esbuild": "^0.17.17",
+    "esbuild": "^0.19.4",
     "vsce": "^2.15.0"
   }
 }
