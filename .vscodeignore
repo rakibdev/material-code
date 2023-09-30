@@ -4,4 +4,5 @@ bun.lockb
 
 .gitignore
 extension.js
+theme.js
 screenshots/
