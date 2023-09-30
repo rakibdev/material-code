@@ -72,7 +72,7 @@
     "@vscode/sudo-prompt": "^9.3.1"
   },
   "devDependencies": {
-    "esbuild": "^0.19.4",
-    "vsce": "^2.15.0"
+    "@vscode/vsce": "^2.21.1",
+    "esbuild": "^0.19.4"
   }
 }
