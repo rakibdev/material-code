@@ -2,7 +2,7 @@
   "name": "material-code",
   "displayName": "Material Code",
   "description": "Dark theme for Visual Studio Code.",
-  "version": "2.0.0",
+  "version": "2.5.0",
   "publisher": "rakib13332",
   "author": "Rakib",
   "icon": "icon.png",
@@ -65,7 +65,7 @@
     "editor": "code-insiders --extensionDevelopmentPath=/home/rakib/Downloads/material-code",
     "dev": "export dev=true && bun theme.js --watch",
     "build": "esbuild extension.js --bundle --outfile=extension.pack.js --external:vscode --format=cjs --platform=node",
-    "release": "bun run build --minify && bun github-release.js && vsce package && vsce publish"
+    "release": "bun run build --minify && bun github-release.js && vsce package --no-dependencies && vsce publish --no-dependencies"
   },
   "dependencies": {
     "@material/material-color-utilities": "^0.2.7",
