@@ -51,4 +51,4 @@ Change round radius
 
 `"window.menuBarVisibility": "hidden"` (Command palette can do everything top menu does)
 
-My [settings.json](https://github.com/rakibdev/dotfiles/blob/main/home/rakib/.config/Code - Insiders/User/settings.json) file.
+My [settings.json](https://github.com/rakibdev/dotfiles/blob/main/home/rakib/.config/Code%20-%20Insiders/User/settings.json) file.
