@@ -65,7 +65,7 @@
     "editor": "code-insiders --extensionDevelopmentPath=/home/rakib/Downloads/material-code",
     "dev": "export dev=true && bun theme.js --watch",
     "build": "esbuild extension.js --bundle --outfile=extension.pack.js --external:vscode --format=cjs --platform=node",
-    "release": "bun run build --minify && bun github-release.js && vsce package --no-dependencies && vsce publish --no-dependencies"
+    "release": "bun run build --minify && bun github-release.js && vsce package --no-dependencies && xdg-open https://marketplace.visualstudio.com/manage"
   },
   "dependencies": {
     "@material/material-color-utilities": "^0.2.7",
