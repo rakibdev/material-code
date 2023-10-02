@@ -42,7 +42,14 @@
         "material-code.primaryColor": {
           "type": "string",
           "default": "#00adff",
-          "description": "Use 6 digit hex color."
+          "pattern": "^#([A-Fa-f0-9]{6})$",
+          "patternErrorMessage": "Use 6 digit hex format (e.g. #RRGGBB)."
+        },
+        "material-code.lightness": {
+          "type": "number",
+          "default": 8,
+          "minimum": 0,
+          "maximum": 10
         },
         "material-code.customCSS": {
           "type": "string",
@@ -63,9 +70,10 @@
   },
   "scripts": {
     "editor": "code-insiders --extensionDevelopmentPath=/home/rakib/Downloads/material-code",
-    "dev": "export dev=true && bun theme.js --watch",
-    "build": "esbuild extension.js --bundle --outfile=extension.pack.js --external:vscode --format=cjs --platform=node",
-    "release": "bun run build --minify && bun github-release.js && vsce package --no-dependencies && xdg-open https://marketplace.visualstudio.com/manage"
+    "build:extension": "esbuild extension.js --bundle --outfile=extension.pack.js --external:vscode --format=cjs --platform=node",
+    "dev:extension": "bun run build:extension --watch",
+    "dev:theme": "export dev=true && bun --watch theme.js",
+    "release": "bun run build:extension --minify && bun github-release.js && vsce package --no-dependencies && xdg-open https://marketplace.visualstudio.com/manage"
   },
   "dependencies": {
     "@material/material-color-utilities": "^0.2.7",

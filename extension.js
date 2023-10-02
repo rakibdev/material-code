@@ -318,22 +318,25 @@ module.exports.activate = async context => {
   const code_injected = workbench_html.includes('material-code')
   const styles_enabled = storage.get('styles_enabled')
   if (styles_enabled && !code_injected) {
-    vscode.window.showInformationMessage("An update reverted Material Code's styles.", 'Re-apply').then(action => {
+    vscode.window
+      .showInformationMessage("Visual Studio Code update reverted Material Code's styles.", 'Re-apply')
+      .then(action => {
       if (action == 'Re-apply') vscode.commands.executeCommand('material-code.applyStyles')
     })
   }
 
-  vscode.workspace.onDidChangeConfiguration(event => {
-    if (event.affectsConfiguration('material-code.primaryColor')) {
-      const color = settings.get('primaryColor')
-      const hexValid = /^#?([A-Fa-f0-9]{6})$/.test(color)
-      if (hexValid) {
-        createTheme({
-          path: context.extensionPath + '/themes/dark.json',
-          dark: true,
-          primary: color
-        })
-      }
+  vscode.workspace.onDidChangeConfiguration(async event => {
+    const primaryColorChanged = event.affectsConfiguration('material-code.primaryColor')
+    const lightnessChanged = event.affectsConfiguration('material-code.lightness')
+
+    if (primaryColorChanged || lightnessChanged) {
+      const options = { primary: settings.get('primaryColor') }
+      if (lightnessChanged) options.lightness = settings.get('lightness')
+      await createTheme(context.extensionPath + '/themes/dark.json', options)
+
+      vscode.window.showInformationMessage('Theme updated. Reload window to see.', 'Reload').then(action => {
+        if (action == 'Reload') vscode.commands.executeCommand('workbench.action.reloadWindow')
+      })
     }
   })
 }

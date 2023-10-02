@@ -1,31 +1,30 @@
 import { promises as fs } from 'fs'
 import { Hct, argbFromHex, hexFromArgb } from '@material/material-color-utilities'
 
-const createColors = palettes => {
+const createColors = options => {
   const hexFromHct = (hue, chroma, tone) => hexFromArgb(Hct.from(hue, chroma, tone).toInt())
-  const primary = Hct.fromInt(argbFromHex(palettes.primary))
-  palettes.neutral = hexFromHct(primary.hue, 10, 40)
+  const primary = Hct.fromInt(argbFromHex(options.primary))
+  options.neutral = hexFromHct(primary.hue, 10, 40)
 
   const colors = {}
-  for (const [colorKey, value] of Object.entries(palettes)) {
+  for (const [colorKey, value] of Object.entries(options)) {
     const isColor = typeof value == 'string' && value.startsWith('#')
     if (!isColor) continue
 
     const { hue, chroma } = Hct.fromInt(argbFromHex(value))
     const maxTone = 98
-    const extraLightness = 8
-    const inverseTone = tone => Math.min(100 - tone + extraLightness, maxTone)
+    const inverseTone = tone => Math.min(100 - tone + options.lightness, maxTone)
 
     const tones = [90, 80, 60, 50, 40, 10]
     tones.forEach(tone => {
-      colors[`${colorKey}_${tone}`] = hexFromHct(hue, chroma, palettes.dark ? inverseTone(tone) : tone)
+      colors[`${colorKey}_${tone}`] = hexFromHct(hue, chroma, options.dark ? inverseTone(tone) : tone)
     })
 
     if (colorKey != 'neutral') {
-      const surface = hexFromHct(hue, 10, palettes.dark ? inverseTone(100) : maxTone)
-      const surface2 = hexFromHct(hue, 15, palettes.dark ? inverseTone(95) : 95)
-      const surface3 = hexFromHct(hue, 20, palettes.dark ? inverseTone(90) : 90)
-      const surface4 = hexFromHct(hue, 20, palettes.dark ? inverseTone(85) : 85)
+      const surface = hexFromHct(hue, 10, options.dark ? inverseTone(100) : maxTone)
+      const surface2 = hexFromHct(hue, 15, options.dark ? inverseTone(95) : 95)
+      const surface3 = hexFromHct(hue, 20, options.dark ? inverseTone(90) : 90)
+      const surface4 = hexFromHct(hue, 20, options.dark ? inverseTone(85) : 85)
       colors[`${colorKey}_surface`] = surface
       colors[`${colorKey}_surface_2`] = surface2
       colors[`${colorKey}_surface_3`] = surface3
@@ -35,16 +34,18 @@ const createColors = palettes => {
   return colors
 }
 
-export const createTheme = options => {
+export const createTheme = (path, options) => {
   const colors = createColors({
-    dark: options.dark,
-    primary: options.primary,
+    dark: true,
+    lightness: 8,
+    primary: '#00adff',
     blue: '#0091ff',
     cyan: '#00adff',
     red: '#ff002b',
     green: '#00ffac',
     pink: '#ff00d9',
-    yellow: '#fff700'
+    yellow: '#fff700',
+    ...options
   })
   colors.transparent = '#ffffff00'
 
@@ -58,7 +59,7 @@ export const createTheme = options => {
       errorForeground: colors.red_40,
       'selection.background': colors.primary_surface_4,
       focusBorder: colors.transparent,
-      'sash.hoverBorder': colors.primary_surface_4,
+      'sash.hoverBorder': colors.primary_40,
       'widget.shadow': colors.transparent,
 
       'button.background': colors.primary_40,
@@ -76,10 +77,9 @@ export const createTheme = options => {
       'input.placeholderForeground': colors.neutral_40,
       'inputOption.activeBackground': colors.primary_surface_3,
       'inputOption.activeForeground': colors.primary_10,
-      'inputValidation.errorForeground': colors.error_10,
+      'inputValidation.errorBackground': colors.error_surface_2,
+      'inputValidation.errorForeground': colors.red_10,
       'inputValidation.errorBorder': colors.transparent,
-
-      'inputValidation.errorBackground': colors.red_40,
 
       'scrollbar.shadow': colors.transparent,
       'scrollbarSlider.background': colors.primary_surface_3,
@@ -215,7 +215,7 @@ export const createTheme = options => {
       'editorIndentGuide.activeBackground': colors.primary_surface_2,
       'editorIndentGuide.background': colors.transparent,
       'editorInfo.foreground': colors.neutral_10,
-      'editorError.foreground': '#ff619e',
+      'editorError.foreground': colors.red_40,
       'editorWarning.foreground': colors.yellow_40,
       'editorLink.activeForeground': colors.neutral_10,
 
@@ -352,7 +352,7 @@ export const createTheme = options => {
     ]
   }
 
-  fs.writeFile(options.path, JSON.stringify(theme))
+  return fs.writeFile(path, JSON.stringify(theme))
 }
 
-if (process.env.dev) createTheme({ dark: true, primary: '#00adff', path: 'themes/dark.json' })
+if (process.env.dev) createTheme('./themes/dark.json')
