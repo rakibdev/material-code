@@ -2,12 +2,14 @@ import vscode from 'vscode'
 import sudo from '@vscode/sudo-prompt'
 import path from 'path'
 import crypto from 'crypto'
+import os from 'os'
 import { promises as fs } from 'fs'
 import { createTheme } from './theme.js'
 
 const app_dir = path.dirname(require.main.filename)
 const workbench_file = path.normalize(app_dir + '/vs/code/electron-sandbox/workbench/workbench.html')
 const product_file = path.normalize(app_dir + '/../product.json')
+let packageJson = null
 
 const storage = {
   dir: '',
@@ -34,6 +36,19 @@ const settings = {
   }
 }
 
+const showErrorNotification = message => {
+  vscode.window.showErrorMessage(message, 'Report on GitHub').then(async action => {
+    if (action == 'Report on GitHub') {
+      const body = `**OS:** ${os.platform()} ${os.release()}\n**Visual Studio Code:** ${
+        vscode.version
+      }\n**Error:** \`${message}\``
+      vscode.env.openExternal(
+        vscode.Uri.parse(packageJson.repository.url + `/issues/new?body=${encodeURIComponent(body)}`)
+      )
+    }
+  })
+}
+
 const updateWorkbenchFile = async workbench_html => {
   const onSuccess = () => {
     vscode.commands.executeCommand('workbench.action.reloadWindow')
@@ -42,7 +57,7 @@ const updateWorkbenchFile = async workbench_html => {
   // updates checksums to fix installation corrupt warning.
   // requires editor full restart to see effect not just reload window.
   let product_json = JSON.parse(await fs.readFile(product_file, 'utf8'))
-  const workbench_file_relative = path.slice(1)
+  const workbench_file_relative = workbench_file.slice(1)
   product_json.checksums[workbench_file_relative] = crypto
     .createHash('md5')
     .update(Buffer.from(workbench_html))
@@ -54,7 +69,7 @@ const updateWorkbenchFile = async workbench_html => {
     await fs.writeFile(workbench_file, workbench_html)
     await fs.writeFile(product_file, product_json)
     onSuccess()
-  } catch (error) {
+  } catch {
     const temp_workbench = storage.dir + 'workbench.html'
     const temp_product = storage.dir + 'product.json'
     await fs.writeFile(temp_workbench, workbench_html)
@@ -68,9 +83,7 @@ const updateWorkbenchFile = async workbench_html => {
         const message = /EPERM|EACCES|ENOENT/.test(error.code)
           ? 'Permission denied. Run editor as admin and try again.'
           : error.message
-        vscode.window.showErrorMessage(message, 'Report on GitHub').then(async action => {
-          if (action == 'Report on GitHub') return '' // todo: create issue with prefilled text
-        })
+        showErrorNotification(message)
       } else onSuccess()
     })
   }
@@ -273,6 +286,7 @@ const isNewVersion = (current, previous) => {
 }
 
 module.exports.activate = async context => {
+  packageJson = context.extension.packageJSON
   await storage.initialize(context)
 
   const commands = [
@@ -288,19 +302,18 @@ module.exports.activate = async context => {
   commands.forEach(command => context.subscriptions.push(command))
 
   const version = storage.get().version
-  const package_version = context.extension.packageJSON.version
-  if (version != package_version) {
-    storage.set('version', package_version)
+  if (version != packageJson.version) {
+    storage.set('version', packageJson.version)
     if (version) {
-      if (isNewVersion(package_version, version)) {
+      if (isNewVersion(packageJson.version, version)) {
         vscode.window
           .showInformationMessage(
-            `Material Code was updated from v${version} to v${package_version}!`,
+            `Material Code was updated to v${packageJson.version} from v${version}!`,
             'Open changelog'
           )
           .then(action => {
             if (action == 'Open changelog') {
-              const releases = `${context.extension.packageJSON.repository.url}/releases`
+              const releases = `${packageJson.repository.url}/releases`
               vscode.env.openExternal(vscode.Uri.parse(releases))
             }
           })
@@ -308,7 +321,7 @@ module.exports.activate = async context => {
     } else {
       vscode.window.showInformationMessage('Material Code is installed!', ['Open GitHub README']).then(action => {
         if (action == 'Open GitHub README') {
-          vscode.env.openExternal(vscode.Uri.parse(context.extension.packageJSON.repository.url))
+          vscode.env.openExternal(vscode.Uri.parse(packageJson.repository.url))
         }
       })
     }
@@ -321,8 +334,8 @@ module.exports.activate = async context => {
     vscode.window
       .showInformationMessage("Visual Studio Code update reverted Material Code's styles.", 'Re-apply')
       .then(action => {
-      if (action == 'Re-apply') vscode.commands.executeCommand('material-code.applyStyles')
-    })
+        if (action == 'Re-apply') vscode.commands.executeCommand('material-code.applyStyles')
+      })
   }
 
   vscode.workspace.onDidChangeConfiguration(async event => {
