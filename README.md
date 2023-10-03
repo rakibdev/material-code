@@ -30,7 +30,7 @@ In rare cases like [this](https://github.com/rakibdev/material-code/issues/2) wh
 
 - Open "workbench.html" file located in vscode installation folder.
   In my case it's "/opt/visual-studio-code-insiders/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html"
-- Remove all code inside "<!--material-code-->" and save.
+- Remove all code inside "\<!--material-code-->" and save.
 - To revert "product.json" which fixes "Installation corrupted" warning, use [Fix VSCode Checksums](https://marketplace.visualstudio.com/items?itemName=lehni.vscode-fix-checksums) extension.
 
 ### Custom CSS setting
