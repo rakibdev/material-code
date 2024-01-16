@@ -1,11 +1,10 @@
 const contextMenuClass = 'context-view'
 const contextMenuCss = `.${contextMenuClass} { border-radius: var(--radius); overflow: hidden; }`
 
-let editorContextMenuShadowRoot = null
-const styleEditorContextMenu = () => {
+const styleEditorContextMenu = shadowRoot => {
   const sheet = new CSSStyleSheet()
   sheet.replaceSync(contextMenuCss)
-  editorContextMenuShadowRoot.adoptedStyleSheets = [sheet]
+  shadowRoot.adoptedStyleSheets = [sheet]
 }
 
 const proxy = (source, method, callback) => {
@@ -20,8 +19,7 @@ const proxy = (source, method, callback) => {
 proxy(Element.prototype, 'attachShadow', shadowRoot => {
   proxy(shadowRoot, 'appendChild', child => {
     if (child.classList.contains(contextMenuClass)) {
-      editorContextMenuShadowRoot = shadowRoot
-      styleEditorContextMenu()
+      styleEditorContextMenu(shadowRoot)
     }
   })
 })
