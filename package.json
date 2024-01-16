@@ -69,18 +69,19 @@
     ]
   },
   "scripts": {
-    "editor": "code-insiders --extensionDevelopmentPath=/home/rakib/Downloads/material-code",
-    "build:extension": "esbuild extension.js --bundle --outfile=extension.pack.js --external:vscode --format=cjs --platform=node",
-    "dev:extension": "bun run build:extension --watch",
+    "preview": "code-insiders --extensionDevelopmentPath=/home/rakib/Downloads/material-code",
+    "build:extension": "bun dev.js",
+    "dev:extension": "export DEV=true && bun dev.js",
     "dev:theme": "export dev=true && bun --watch theme.js",
-    "release": "bun run build:extension --minify && bun github-release.js && vsce package --no-dependencies && xdg-open https://marketplace.visualstudio.com/manage"
+    "release": "bun run build:extension && bun github-release.js && vsce package --no-dependencies && xdg-open https://marketplace.visualstudio.com/manage"
   },
   "dependencies": {
     "@material/material-color-utilities": "^0.2.7",
     "@vscode/sudo-prompt": "^9.3.1"
   },
   "devDependencies": {
-    "@vscode/vsce": "^2.21.1",
-    "esbuild": "^0.19.4"
+    "@vscode/vsce": "^2.22.0",
+    "esbuild": "^0.19.11",
+    "esbuild-plugin-inline-import": "^1.0.2"
   }
 }

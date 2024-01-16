@@ -1,3 +1,6 @@
+import injectCss from 'inline:./inject.css'
+import injectJs from 'inline:./inject.js'
+
 import vscode from 'vscode'
 import sudo from '@vscode/sudo-prompt'
 import path from 'path'
@@ -89,190 +92,25 @@ const updateWorkbenchFile = async workbench_html => {
   }
 }
 
-const removeInjectedCode = workbench_html => workbench_html.replace(/<!--material-code-->.*?<!--material-code-->/s, '')
+const stripInjectCode = workbench_html =>
+  workbench_html.replace(/\n*?<!--material-code-->.*?<!--material-code-->\n*?/s, '\n\n')
 
-const removeStyles = async () => {
+const onRemoveStylesCommand = async () => {
   const html = await fs.readFile(workbench_file, 'utf8')
-  updateWorkbenchFile(removeInjectedCode(html))
+  updateWorkbenchFile(stripInjectCode(html))
 }
 
-const applyStyles = async () => {
-  let css = `
-  body {
-    --radius: 20px;
-  }
-  
-  [role=tab] {
-    border-radius: 20px 20px 8px 8px;
-  }
-  
-  [role=button],
-  [role=tooltip],
-  [role=dialog],
-  .monaco-menu,
-  .editor-widget, /* find & replace */
-  .menubar-menu-button, /* title bar menu buttons */
-  .notifications-center {
-    border-radius: var(--radius) !important;
-  }
-  
-  .monaco-menu-container,
-  .monaco-editor .suggest-widget, /* autocomplete */
-  .quick-input-widget, /* command palette */
-  .notification-toast {
-    border-radius: var(--radius) !important;
-    overflow: hidden;
-  }
-  
-  /* icon button */
-  .codicon {
-    border-radius: var(--radius);
-  }
-  
-  input,
-  select,
-  .monaco-inputbox, /* extensions, settings search input */
-  .suggest-input-container {
-    border-radius: 10px;
-    padding-left: 8px;
-    padding-right: 8px;
-  }
-  
-  /* .selected-text radius */
-  .monaco-editor .top-left-radius {
-    border-top-left-radius: 5px;
-  }
-  .monaco-editor .bottom-left-radius {
-    border-bottom-left-radius: 5px;
-  }
-  .monaco-editor .top-right-radius {
-    border-top-right-radius: 5px;
-  }
-  .monaco-editor .bottom-right-radius {
-    border-bottom-right-radius: 5px;
-  }
-  
-  /* ripple */
-  .ripple-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    border-radius: inherit;
-    overflow: hidden;
-    pointer-events: none;
-  }
-  .ripple {
-    background-color: currentColor;
-    opacity: 0.19;
-    border-radius: 50%;
-    position: absolute;
-    -webkit-mask-image: radial-gradient(closest-side, #fff 65%, transparent);
-  }
-  `
-  const custom_css = settings.get('customCSS')
-  if (custom_css) css += custom_css
-
-  const script = `
-  const addListeners = (element, events, func, options = {}) => {
-    events.split(' ').forEach(event => {
-      element.addEventListener(event, func, options[event])
-    })
-  }
-  
-  const removeListeners = (element, events, func) => {
-    events.split(' ').forEach(event => {
-      element.removeEventListener(event, func)
-    })
-  }
-
-  const showRipple = (element, event) => {
-    const rect = element.getBoundingClientRect()
-    const x = event.clientX ? event.clientX - rect.left : rect.width / 2
-    const y = event.clientY ? event.clientY - rect.top : rect.height / 2
-    const corners = [
-      { x: 0, y: 0 },
-      { x: rect.width, y: 0 },
-      { x: 0, y: rect.height },
-      { x: rect.width, y: rect.height }
-    ]
-    let radius = 0
-    corners.forEach(corner => {
-      const x_delta = x - corner.x
-      const y_delta = y - corner.y
-      const corner_distance = Math.sqrt(x_delta * x_delta + y_delta * y_delta)
-      if (corner_distance > radius) {
-        radius = corner_distance
-      }
-    })
-    // ripple soft edge size 65% of container.
-    radius += radius * (65 / 100)
-    const ripple = document.createElement('div')
-    ripple.className = 'ripple'
-    ripple.style.width = radius * 2 + 'px'
-    ripple.style.height = ripple.style.width
-    ripple.style.left = x - radius + 'px'
-    ripple.style.top = y - radius + 'px'
-  
-    const container = document.createElement('div')
-    container.className = 'ripple-container'
-    container.appendChild(ripple)
-    element.appendChild(container)
-  
-    const ripple_animation = ripple.animate({ transform: ['scale(0.1)', 'scale(1)'] }, 400)
-    const hideRipple = async () => {
-      removeListeners(element, 'pointerup pointerleave', hideRipple)
-      await ripple_animation.finished
-      const hide_animation = ripple.animate(
-        { opacity: [getComputedStyle(ripple).opacity, 0] },
-        { duration: 100, fill: 'forwards' }
-      )
-      await hide_animation.finished
-      ripple.remove()
-      container.remove()
-    }
-    addListeners(element, 'pointerup pointerleave', hideRipple)
-  }
-  
-  const findParent = (element, selector) => {
-    const max_depth = 5
-    let count = 0
-    while (element) {
-      if (element.matches(selector)) return element
-      element = element.parentElement
-      if (++count > max_depth) return
-    }
-  }
-
-  const applyContextMenuStyles = () => {
-    const sheet = new CSSStyleSheet()
-    sheet.replaceSync('.monaco-menu-container { border-radius: var(--radius) !important; overflow: hidden; }')
-    const host = document.querySelector('.shadow-root-host')
-    if (host?.shadowRoot) host.shadowRoot.adoptedStyleSheets = [sheet]
-  }
-
-  document.body.addEventListener('pointerdown', event => {
-    const mouse_right_click = event.button == 2
-    if (mouse_right_click) return setTimeout(applyContextMenuStyles, 30)
-    
-    const ripple_element = findParent(
-      event.target,
-      '[role=button], [role=tab], [role=listitem], [role=treeitem], [role=menuitem], [role=option], .scrollbar > .slider'
-    )
-    if (ripple_element) {
-      if (getComputedStyle(ripple_element).position == 'static') ripple_element.style.position = 'relative'
-      showRipple(ripple_element, event)
-    }
-  })
-  `
+const onApplyStylesCommand = async () => {
+  const customCss = settings.get('customCSS')
 
   let html = await fs.readFile(workbench_file, 'utf8')
-  html = removeInjectedCode(html)
+  html = stripInjectCode(html)
     .replace(/<meta.*http-equiv="Content-Security-Policy".*?>/s, '')
     .replace(
-      '</html>',
-      `<!--material-code--><style>${css}</style><script>${script}</script><!--material-code-->\n</html>`
+      /\n*?<\/html>/,
+      `\n\n<!--material-code-->\n<style>\n${
+        injectCss + customCss
+      }</style>\n<script>\n${injectJs}</script>\n<!--material-code-->\n\n</html>`
     )
   updateWorkbenchFile(html)
 }
@@ -292,11 +130,11 @@ module.exports.activate = async context => {
   const commands = [
     vscode.commands.registerCommand('material-code.applyStyles', async () => {
       await storage.set('styles_enabled', true)
-      applyStyles()
+      onApplyStylesCommand()
     }),
     vscode.commands.registerCommand('material-code.removeStyles', async () => {
       await storage.set('styles_enabled', false)
-      removeStyles()
+      onRemoveStylesCommand()
     })
   ]
   commands.forEach(command => context.subscriptions.push(command))

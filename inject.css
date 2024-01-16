@@ -1,0 +1,72 @@
+body {
+  --radius: 20px;
+}
+
+[role='tab'] {
+  border-radius: 20px 20px 8px 8px;
+}
+
+[role=button],
+[role=tooltip],
+[role=dialog],
+.monaco-menu,
+.editor-widget, /* find & replace */
+.menubar-menu-button, /* title bar menu buttons */
+.notifications-center {
+  border-radius: var(--radius) !important;
+}
+
+.monaco-menu-container,
+.monaco-editor .suggest-widget, /* autocomplete */
+.quick-input-widget, /* command palette */
+.notification-toast {
+  border-radius: var(--radius) !important;
+  overflow: hidden;
+}
+
+/* icon button */
+.codicon {
+  border-radius: var(--radius);
+}
+
+input,
+select,
+.monaco-inputbox, /* extensions, settings search input */
+.suggest-input-container {
+  border-radius: 10px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+/* .selected-text radius */
+.monaco-editor .top-left-radius {
+  border-top-left-radius: 5px;
+}
+.monaco-editor .bottom-left-radius {
+  border-bottom-left-radius: 5px;
+}
+.monaco-editor .top-right-radius {
+  border-top-right-radius: 5px;
+}
+.monaco-editor .bottom-right-radius {
+  border-bottom-right-radius: 5px;
+}
+
+/* ripple */
+.ripple-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ripple {
+  background-color: currentColor;
+  opacity: 0.19;
+  border-radius: 50%;
+  position: absolute;
+  -webkit-mask-image: radial-gradient(closest-side, #fff 65%, transparent);
+}
