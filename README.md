@@ -10,7 +10,7 @@
 - Ripple effect.
 - Custom CSS.
 
-Let me know your suggestions, issues on [Github](https://github.com/rakibdev/material-code)
+Let me know your suggestions, issues on [Github](https://github.com/rakibdev/material-code/issues)
 
 ## Usage
 

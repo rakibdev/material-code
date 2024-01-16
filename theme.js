@@ -40,7 +40,7 @@ export const createTheme = (path, options) => {
     lightness: 8,
     primary: '#00adff',
     blue: '#0091ff',
-    cyan: '#00adff',
+    skyblue: '#00adff',
     red: '#ff002b',
     green: '#00ffac',
     pink: '#ff00d9',
@@ -53,8 +53,8 @@ export const createTheme = (path, options) => {
     name: 'Material Code',
     type: 'dark',
     colors: {
-      foreground: colors.neutral_10,
-      'icon.foreground': colors.neutral_10,
+      foreground: colors.neutral_20,
+      'icon.foreground': colors.neutral_20,
       'textLink.foreground': colors.primary_40,
       errorForeground: colors.red_40,
       'selection.background': colors.primary_surface_4,
@@ -97,12 +97,12 @@ export const createTheme = (path, options) => {
       'listFilterWidget.background': colors.primary_surface_3,
 
       'activityBar.background': colors.primary_surface,
-      'activityBar.foreground': colors.neutral_10,
+      'activityBar.foreground': colors.neutral_20,
       'activityBar.activeBorder': colors.transparent,
       'activityBar.activeBackground': colors.primary_surface_2,
 
       'sideBar.background': colors.primary_surface,
-      'sideBar.foreground': colors.neutral_10,
+      'sideBar.foreground': colors.neutral_20,
       'sideBar.border': colors.transparent,
       'sideBarSectionHeader.background': colors.transparent,
 
@@ -111,7 +111,7 @@ export const createTheme = (path, options) => {
       'editorGroupHeader.tabsBackground': colors.primary_surface,
 
       'tab.activeBackground': colors.primary_surface_2,
-      'tab.activeForeground': colors.neutral_10,
+      'tab.activeforeground': colors.neutral_20,
       'tab.hoverBackground': colors.primary_surface_3,
       'tab.inactiveBackground': colors.primary_surface,
       'tab.inactiveForeground': colors.neutral_40,
@@ -120,8 +120,8 @@ export const createTheme = (path, options) => {
       'panel.background': colors.primary_surface_2,
       'panel.border': colors.transparent,
       'panel.dropBorder': colors.primary_40,
-      'panelTitle.activeForeground': colors.neutral_10,
-      'panelTitle.activeBorder': colors.neutral_10,
+      'panelTitle.activeforeground': colors.neutral_20,
+      'panelTitle.activeBorder': colors.neutral_20,
       'panelTitle.inactiveForeground': colors.neutral_40,
 
       'statusBar.debuggingBackground': colors.primary_surface,
@@ -166,35 +166,35 @@ export const createTheme = (path, options) => {
 
       'menubar.selectionBackground': colors.primary_surface_2,
       'menu.background': colors.primary_surface_2,
-      'menu.foreground': colors.neutral_10,
+      'menu.foreground': colors.neutral_20,
       'menu.selectionBackground': colors.primary_surface_3,
       'menu.separatorBackground': colors.transparent,
 
       'pickerGroup.border': colors.transparent,
 
       'keybindingLabel.background': colors.primary_surface_3,
-      'keybindingLabel.foreground': colors.neutral_10,
+      'keybindingLabel.foreground': colors.neutral_20,
       'keybindingLabel.border': colors.transparent,
       'keybindingLabel.bottomBorder': colors.transparent,
 
       'titleBar.activeBackground': colors.primary_surface,
-      'titleBar.activeForeground': colors.neutral_10,
+      'titleBar.activeforeground': colors.neutral_20,
       'titleBar.inactiveBackground': colors.primary_surface,
-      'titleBar.inactiveForeground': colors.neutral_10,
+      'titleBar.inactiveforeground': colors.neutral_20,
 
       'statusBar.background': colors.primary_surface,
-      'statusBar.foreground': colors.neutral_10,
+      'statusBar.foreground': colors.neutral_20,
       'statusBar.border': colors.transparent,
       'statusBar.focusBorder': colors.transparent,
       'statusBar.noFolderBackground': colors.primary_surface,
       'statusBarItem.hoverBackground': colors.primary_surface_2,
       'statusBarItem.activeBackground': colors.primary_surface_2,
       'statusBarItem.remoteBackground': colors.primary_surface,
-      'statusBarItem.remoteForeground': colors.neutral_10,
+      'statusBarItem.remoteforeground': colors.neutral_20,
 
       'editor.background': colors.primary_surface,
-      'editor.foreground': colors.neutral_10,
-      'editorCursor.foreground': colors.neutral_10,
+      'editor.foreground': colors.neutral_20,
+      'editorCursor.foreground': colors.neutral_20,
       'editor.lineHighlightBackground': colors.primary_surface_2,
       'editor.selectionBackground': colors.primary_80,
       'editor.wordHighlightBackground': colors.primary_80,
@@ -214,10 +214,10 @@ export const createTheme = (path, options) => {
 
       'editorIndentGuide.activeBackground': colors.primary_surface_2,
       'editorIndentGuide.background': colors.transparent,
-      'editorInfo.foreground': colors.neutral_10,
+      'editorInfo.foreground': colors.neutral_20,
       'editorError.foreground': colors.red_40,
       'editorWarning.foreground': colors.yellow_40,
-      'editorLink.activeForeground': colors.neutral_10,
+      'editorLink.activeforeground': colors.neutral_20,
 
       'editorLineNumber.foreground': colors.primary_surface_3,
       'editorLineNumber.activeForeground': colors.neutral_40,
@@ -230,12 +230,12 @@ export const createTheme = (path, options) => {
       'peekViewEditor.background': colors.primary_surface_2,
       'peekViewResult.background': colors.primary_surface_3,
       'peekViewTitleLabel.foreground': colors.primary_40,
-      'peekViewTitleDescription.foreground': colors.neutral_10,
+      'peekViewTitleDescription.foreground': colors.neutral_20,
       'peekViewEditor.matchHighlightBackground': colors.primary_90,
       'peekViewResult.matchHighlightBackground': colors.primary_90,
       'peekViewResult.selectionBackground': colors.primary_surface_3,
       'peekViewResult.selectionForeground': colors.primary_10,
-      'peekViewResult.lineForeground': colors.neutral_10,
+      'peekViewResult.lineforeground': colors.neutral_20,
 
       'notificationCenterHeader.background': colors.primary_surface_3,
       'notifications.background': colors.primary_surface_3,
@@ -248,17 +248,17 @@ export const createTheme = (path, options) => {
       'progressBar.background': colors.primary_40,
       'tree.indentGuidesStroke': colors.primary_surface_2,
 
-      'terminal.foreground': colors.neutral_10,
+      'terminal.foreground': colors.neutral_20,
       'terminal.ansiBrightBlue': colors.blue_50,
       'terminal.ansiBrightGreen': colors.green_40,
       'terminal.ansiBrightRed': colors.red_50,
       'terminal.ansiBrightYellow': colors.yellow_40,
-      'terminal.ansiBrightCyan': colors.cyan_40,
+      'terminal.ansiBrightCyan': colors.skyblue_40,
       'terminal.ansiBrightMagenta': colors.pink_50,
 
       'breadcrumb.foreground': colors.neutral_40,
-      'breadcrumb.focusForeground': colors.neutral_10,
-      'breadcrumb.activeSelectionForeground': colors.neutral_10,
+      'breadcrumb.focusforeground': colors.neutral_20,
+      'breadcrumb.activeSelectionforeground': colors.neutral_20,
       'breadcrumbPicker.background': colors.primary_surface_2
     },
     tokenColors: [
@@ -321,7 +321,7 @@ export const createTheme = (path, options) => {
       {
         scope: ['variable.other', 'punctuation.definition'],
         settings: {
-          foreground: colors.cyan_40
+          foreground: colors.skyblue_40
         }
       },
       {
