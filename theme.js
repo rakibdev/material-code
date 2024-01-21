@@ -1,5 +1,6 @@
-import { promises as fs } from 'fs'
+import vscode from 'vscode'
 import { Hct, argbFromHex, hexFromArgb } from '@material/material-color-utilities'
+import { writeFile } from './utils'
 
 const createColors = options => {
   const hexFromHct = (hue, chroma, tone) => hexFromArgb(Hct.from(hue, chroma, tone).toInt())
@@ -34,7 +35,7 @@ const createColors = options => {
   return colors
 }
 
-export const createTheme = (path, options) => {
+export const createTheme = (file, options) => {
   const colors = createColors({
     dark: true,
     lightness: 8,
@@ -352,7 +353,5 @@ export const createTheme = (path, options) => {
     ]
   }
 
-  return fs.writeFile(path, JSON.stringify(theme))
+  return writeFile(vscode.Uri.file(file), JSON.stringify(theme))
 }
-
-if (process.env.dev) createTheme('./themes/dark.json')

@@ -18,9 +18,7 @@ const proxy = (source, method, callback) => {
 
 proxy(Element.prototype, 'attachShadow', shadowRoot => {
   proxy(shadowRoot, 'appendChild', child => {
-    if (child.classList.contains(contextMenuClass)) {
-      styleEditorContextMenu(shadowRoot)
-    }
+    if (child.classList.contains(contextMenuClass)) styleEditorContextMenu(shadowRoot)
   })
 })
 

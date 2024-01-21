@@ -2,34 +2,34 @@ import injectCss from 'inline:./inject.css'
 import injectJs from 'inline:./inject.js'
 
 import vscode from 'vscode'
-import sudo from '@vscode/sudo-prompt'
-import path from 'path'
-import crypto from 'crypto'
-import os from 'os'
-import { promises as fs } from 'fs'
+import sudo from '@vscode/sudo-prompt' // todo: dynamic import
 import { createTheme } from './theme.js'
+import { readFile, writeFile, errorNotification } from './utils.js'
 
-const app_dir = path.dirname(require.main.filename)
-const workbench_file = path.normalize(app_dir + '/vs/code/electron-sandbox/workbench/workbench.html')
-const product_file = path.normalize(app_dir + '/../product.json')
+// const isWeb = vscode.env.appHost != 'desktop'
+const vscodeRoot = vscode.Uri.file(vscode.env.appRoot)
+const workbenchFile = vscode.Uri.joinPath(vscodeRoot, 'out/vs/code/electron-sandbox/workbench/workbench.html')
+let appDataDir = null
 let packageJson = null
 
-const storage = {
-  dir: '',
-  data: {},
-  async initialize(extension_context) {
-    storage.dir = path.normalize(extension_context.globalStorageUri.path + '/')
-    await fs.mkdir(storage.dir, { recursive: true })
+const appData = {
+  content: {},
+  async initialize() {
     try {
-      storage.data = JSON.parse(await fs.readFile(storage.dir + 'storage.json', 'utf8'))
-    } catch {}
+      const storageFile = vscode.Uri.joinPath(appDataDir, 'storage.json')
+      await vscode.workspace.fs.stat(storageFile)
+      appData.content = JSON.parse(await readFile(storageFile))
+    } catch (error) {
+      if (error.code == 'FileNotFound') await vscode.workspace.fs.createDirectory(appDataDir)
+      else errorNotification(error.message)
+    }
   },
   get(key) {
-    return key ? storage.data[key] : storage.data
+    return key ? appData.content[key] : appData.content
   },
   set(key, value) {
-    storage.data[key] = value
-    return fs.writeFile(storage.dir + 'storage.json', JSON.stringify(storage.data))
+    appData.content[key] = value
+    return writeFile(vscode.Uri.joinPath(appDataDir, 'storage.json'), JSON.stringify(appData.content))
   }
 }
 
@@ -39,80 +39,52 @@ const settings = {
   }
 }
 
-const showErrorNotification = message => {
-  vscode.window.showErrorMessage(message, 'Report on GitHub').then(async action => {
-    if (action == 'Report on GitHub') {
-      const body = `**OS:** ${os.platform()} ${os.release()}\n**Visual Studio Code:** ${
-        vscode.version
-      }\n**Error:** \`${message}\``
-      vscode.env.openExternal(
-        vscode.Uri.parse(packageJson.repository.url + `/issues/new?body=${encodeURIComponent(body)}`)
-      )
-    }
-  })
-}
-
-const updateWorkbenchFile = async workbench_html => {
+const updateEditorFiles = async workbenchHtml => {
   const onSuccess = () => {
     vscode.commands.executeCommand('workbench.action.reloadWindow')
   }
 
-  // updates checksums to fix installation corrupt warning.
-  // requires editor full restart to see effect not just reload window.
-  let product_json = JSON.parse(await fs.readFile(product_file, 'utf8'))
-  const workbench_file_relative = workbench_file.slice(1)
-  product_json.checksums[workbench_file_relative] = crypto
-    .createHash('md5')
-    .update(Buffer.from(workbench_html))
-    .digest('base64')
-    .replace(/=+$/, '')
-  product_json = JSON.stringify(product_json, null, '\t')
-
   try {
-    await fs.writeFile(workbench_file, workbench_html)
-    await fs.writeFile(product_file, product_json)
+    await writeFile(workbenchFile, workbenchHtml)
     onSuccess()
   } catch {
-    const temp_workbench = storage.dir + 'workbench.html'
-    const temp_product = storage.dir + 'product.json'
-    await fs.writeFile(temp_workbench, workbench_html)
-    await fs.writeFile(temp_product, product_json)
-    const move_command = process.platform.includes('win') ? 'move' : 'mv'
-    const command = `${move_command} "${temp_workbench}" "${workbench_file}" && ${move_command} "${temp_product}" "${product_file}"`
-    sudo.exec(command, { name: 'Material Code' }, error => {
+    const tempWorkbenchFile = vscode.Uri.joinPath(appDataDir, 'workbench.html')
+    await writeFile(tempWorkbenchFile, workbenchHtml)
+    const moveCommand = process.platform.includes('win') ? 'move' : 'mv'
+    const command = `${moveCommand} "${tempWorkbenchFile.fsPath}" "${workbenchFile.fsPath}"`
+    sudo.exec(command, { name: packageJson.displayName }, async error => {
       if (error) {
-        fs.unlink(temp_workbench)
-        fs.unlink(temp_product)
-        const message = /EPERM|EACCES|ENOENT/.test(error.code)
-          ? 'Permission denied. Run editor as admin and try again.'
-          : error.message
-        showErrorNotification(message)
+        await vscode.workspace.fs.delete(tempWorkbenchFile)
+        errorNotification(
+          /EPERM|EACCES|ENOENT/.test(error.code)
+            ? 'Permission denied. Run editor as admin and try again.'
+            : error.message
+        )
       } else onSuccess()
     })
   }
 }
 
-const stripInjectCode = workbench_html =>
-  workbench_html.replace(/\n*?<!--material-code-->.*?<!--material-code-->\n*?/s, '\n\n')
+const clearInjectedCode = workbenchHtml =>
+  workbenchHtml.replace(/\n*?<!--material-code-->.*?<!--material-code-->\n*?/s, '\n\n')
 
 const onRemoveStylesCommand = async () => {
-  const html = await fs.readFile(workbench_file, 'utf8')
-  updateWorkbenchFile(stripInjectCode(html))
+  const html = await readFile(workbenchFile)
+  updateEditorFiles(clearInjectedCode(html))
 }
 
 const onApplyStylesCommand = async () => {
-  const customCss = settings.get('customCSS')
-
-  let html = await fs.readFile(workbench_file, 'utf8')
-  html = stripInjectCode(html)
+  const userCss = settings.get('customCSS')
+  let html = await readFile(workbenchFile)
+  html = clearInjectedCode(html)
     .replace(/<meta.*http-equiv="Content-Security-Policy".*?>/s, '')
     .replace(
       /\n*?<\/html>/,
       `\n\n<!--material-code-->\n<style>\n${
-        injectCss + customCss
+        injectCss + userCss
       }</style>\n<script>\n${injectJs}</script>\n<!--material-code-->\n\n</html>`
     )
-  updateWorkbenchFile(html)
+  updateEditorFiles(html)
 }
 
 const isNewVersion = (current, previous) => {
@@ -124,72 +96,72 @@ const isNewVersion = (current, previous) => {
 }
 
 module.exports.activate = async context => {
+  appDataDir = context.globalStorageUri
   packageJson = context.extension.packageJSON
-  await storage.initialize(context)
+  await appData.initialize(context)
 
   const commands = [
     vscode.commands.registerCommand('material-code.applyStyles', async () => {
-      await storage.set('styles_enabled', true)
+      await appData.set('styles_enabled', true)
       onApplyStylesCommand()
     }),
     vscode.commands.registerCommand('material-code.removeStyles', async () => {
-      await storage.set('styles_enabled', false)
+      await appData.set('styles_enabled', false)
       onRemoveStylesCommand()
     })
   ]
   commands.forEach(command => context.subscriptions.push(command))
 
-  const version = storage.get().version
+  const version = appData.get().version
   if (version != packageJson.version) {
-    storage.set('version', packageJson.version)
+    appData.set('version', packageJson.version)
     if (version) {
-      if (isNewVersion(packageJson.version, version)) {
-        vscode.window
-          .showInformationMessage(
-            `Material Code was updated to v${packageJson.version} from v${version}!`,
-            'Open changelog'
-          )
-          .then(action => {
-            if (action == 'Open changelog') {
-              const releases = `${packageJson.repository.url}/releases`
-              vscode.env.openExternal(vscode.Uri.parse(releases))
-            }
-          })
-      }
+      // if (isNewVersion(packageJson.version, version)) {
+      //   vscode.window
+      //     .showInformationMessage(
+      //       `${packageJson.displayName} was updated to v${packageJson.version} from v${version}!`,
+      //       'Open changelog'
+      //     )
+      //     .then(action => {
+      //       if (action == 'Open changelog') {
+      //         const releases = `${packageJson.repository.url}/releases`
+      //         vscode.env.openExternal(vscode.Uri.parse(releases))
+      //       }
+      //     })
+      // }
     } else {
-      vscode.window.showInformationMessage('Material Code is installed!', ['Open GitHub README']).then(action => {
-        if (action == 'Open GitHub README') {
-          vscode.env.openExternal(vscode.Uri.parse(packageJson.repository.url))
-        }
-      })
+      vscode.window
+        .showInformationMessage(`${packageJson.displayName} installed! See README?`, 'Open', 'Cancel')
+        .then(action => {
+          if (action == 'Open') vscode.env.openExternal(vscode.Uri.parse(packageJson.repository.url))
+        })
     }
   }
 
-  const workbench_html = await fs.readFile(workbench_file, 'utf8')
-  const code_injected = workbench_html.includes('material-code')
-  const styles_enabled = storage.get('styles_enabled')
-  if (styles_enabled && !code_injected) {
-    vscode.window
-      .showInformationMessage("Visual Studio Code update reverted Material Code's styles.", 'Re-apply')
-      .then(action => {
-        if (action == 'Re-apply') vscode.commands.executeCommand('material-code.applyStyles')
-      })
+  const enabled = appData.get('styles_enabled')
+  const html = await readFile(workbenchFile)
+  const hasCode = html.includes('material-code')
+  if (enabled && !hasCode) {
+    vscode.window.showInformationMessage('Re-apply styles?', 'Ignore', 'Ok').then(action => {
+      if (action == 'Ok') vscode.commands.executeCommand('material-code.applyStyles')
+      if (action == 'Ignore') appData.set('styles_enabled', false)
+    })
   }
 
   vscode.workspace.onDidChangeConfiguration(async event => {
     const primaryColorChanged = event.affectsConfiguration('material-code.primaryColor')
     const lightnessChanged = event.affectsConfiguration('material-code.lightness')
-
     if (primaryColorChanged || lightnessChanged) {
       const options = { primary: settings.get('primaryColor') }
       if (lightnessChanged) options.lightness = settings.get('lightness')
       await createTheme(context.extensionPath + '/themes/dark.json', options)
-
-      vscode.window.showInformationMessage('Theme updated. Reload window to see.', 'Reload').then(action => {
+      vscode.window.showInformationMessage('Theme updated. Reload window to see changes.', 'Reload').then(action => {
         if (action == 'Reload') vscode.commands.executeCommand('workbench.action.reloadWindow')
       })
     }
   })
+
+  if (process.env.DEV) createTheme(context.extensionPath + './themes/dark.json')
 }
 
 module.exports.deactivate = () => {}

@@ -3,7 +3,8 @@ bun.lockb
 *.vsix
 
 .gitignore
-extension.js
-theme.js
-github-release.js
+**/*.js
+**/*.css
 screenshots/
+
+!main.build.js
