@@ -14,13 +14,13 @@ Let me know your suggestions, issues on [Github](https://github.com/rakibdev/mat
 
 ## Usage
 
-Theme works straight away.
+Material You theme works straight away.
 
-Additional styling (rounded corners, ripple effect, custom CSS) requires running "Material Code: Apply styles" from command palette, which injects custom code into vscode installation files "workbench.html" and "product.json". Therefore extension may ask for administrative privileges everytime you do this or you can manually run vscode as administrator once.
+Other features requires running "Material Code: Apply styles" from command palette, which injects custom code into vscode installation file "workbench.html". Therefore extension may ask for administrative privileges if needed.
 
-After applied vscode will show "Installation corrupted" notification. This can be safely ignored. Click notification gear icon > "Don't show again".
+After applying vscode will warn "Installation corrupted" notification. This can be safely ignored, click notification gear icon > "Don't show again".
 
-To remove styles run "Material Code: Remove styles" from command palette which reverts those files to original.
+To remove styles run "Material Code: Remove styles" from command palette which reverts "workbench.html" to original.
 
 ## Help
 
@@ -29,9 +29,9 @@ To remove styles run "Material Code: Remove styles" from command palette which r
 In rare cases like [this](https://github.com/rakibdev/material-code/issues/2) where "Material Code: Remove styles" not working. Generally updating vscode version will revert itself including the styles. But if you need fix urgent:
 
 - Open "workbench.html" file located in vscode installation folder.
-  In my case it's "/opt/visual-studio-code-insiders/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html"
-- Remove all code inside "\<!--material-code-->" and save.
-- To revert "product.json" which fixes "Installation corrupted" warning, use [Fix VSCode Checksums](https://marketplace.visualstudio.com/items?itemName=lehni.vscode-fix-checksums) extension.
+  In my case (Linux) it's "/opt/visual-studio-code-insiders/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html"
+- Remove all code inside "<--material-code-->" block and save.
+- To fix "Installation corrupted" warning, use [Fix VSCode Checksums](https://marketplace.visualstudio.com/items?itemName=lehni.vscode-fix-checksums) extension.
 
 ### Custom CSS setting
 

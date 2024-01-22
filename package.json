@@ -44,14 +44,14 @@
           "default": "#00adff",
           "pattern": "^#([A-Fa-f0-9]{6})$",
           "patternErrorMessage": "Use 6 digit hex format (e.g. #RRGGBB).",
-          "description": "Requires reload."
+          "description": "Requires window reload."
         },
         "material-code.lightness": {
           "type": "number",
           "default": 8,
           "minimum": 0,
           "maximum": 10,
-          "description": "Requires reload."
+          "description": "Requires window reload."
         },
         "material-code.customCSS": {
           "type": "string",

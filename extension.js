@@ -39,7 +39,7 @@ const settings = {
   }
 }
 
-const updateEditorFiles = async workbenchHtml => {
+const updateInstallationFiles = async workbenchHtml => {
   const onSuccess = () => {
     vscode.commands.executeCommand('workbench.action.reloadWindow')
   }
@@ -70,7 +70,7 @@ const clearInjectedCode = workbenchHtml =>
 
 const onRemoveStylesCommand = async () => {
   const html = await readFile(workbenchFile)
-  updateEditorFiles(clearInjectedCode(html))
+  updateInstallationFiles(clearInjectedCode(html))
 }
 
 const onApplyStylesCommand = async () => {
@@ -84,7 +84,7 @@ const onApplyStylesCommand = async () => {
         injectCss + userCss
       }</style>\n<script>\n${injectJs}</script>\n<!--material-code-->\n\n</html>`
     )
-  updateEditorFiles(html)
+  updateInstallationFiles(html)
 }
 
 const isNewVersion = (current, previous) => {
@@ -161,7 +161,7 @@ module.exports.activate = async context => {
     }
   })
 
-  if (process.env.DEV) createTheme(context.extensionPath + './themes/dark.json')
+  if (process.env.DEV) createTheme(context.extensionPath + '/themes/dark.json')
 }
 
 module.exports.deactivate = () => {}
