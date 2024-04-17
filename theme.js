@@ -2,70 +2,72 @@ import { Hct, argbFromHex, hexFromArgb } from '@material/material-color-utilitie
 
 const hexFromHct = (hue, chroma, tone) => hexFromArgb(Hct.from(hue, chroma, tone).toInt())
 
+const maxLightness = 99
+let darkThemeExtraLightness = 8
+const inverseTone = tone => Math.min(100 - tone + darkThemeExtraLightness, maxLightness)
+
 const createColors = options => {
   const primary = Hct.fromInt(argbFromHex(options.primary))
   options.neutral = hexFromHct(primary.hue, 10, 40)
 
   const colors = {}
-  for (const [colorKey, value] of Object.entries(options)) {
+  for (const [key, value] of Object.entries(options)) {
     const isColor = typeof value == 'string' && value.startsWith('#')
     if (!isColor) continue
 
     const { hue, chroma } = Hct.fromInt(argbFromHex(value))
-    const maxTone = 98
-    const inverseTone = tone => Math.min(100 - tone + options.lightness, maxTone)
-
-    const tones = [90, 80, 60, 50, 40, 10]
+    const tones = [80, 50, 40, 20]
     tones.forEach(tone => {
-      colors[`${colorKey}_${tone}`] = hexFromHct(hue, chroma, options.dark ? inverseTone(tone) : tone)
+      colors[`${key}_${tone}`] = hexFromHct(hue, chroma, options.dark ? inverseTone(tone) : tone)
     })
-
-    if (colorKey != 'neutral') {
-      const surface = hexFromHct(hue, 10, options.dark ? inverseTone(100) : maxTone)
-      const surface2 = hexFromHct(hue, 15, options.dark ? inverseTone(95) : 95)
-      const surface3 = hexFromHct(hue, 20, options.dark ? inverseTone(90) : 90)
-      const surface4 = hexFromHct(hue, 20, options.dark ? inverseTone(85) : 85)
-      colors[`${colorKey}_surface`] = surface
-      colors[`${colorKey}_surface_2`] = surface2
-      colors[`${colorKey}_surface_3`] = surface3
-      colors[`${colorKey}_surface_4`] = surface4
+    if (key != 'neutral') {
+      colors[`${key}_surface`] = hexFromHct(hue, 8, options.dark ? inverseTone(102) : maxLightness)
+      colors[`${key}_surface_2`] = hexFromHct(hue, 16, options.dark ? inverseTone(95) : 95)
+      colors[`${key}_surface_3`] = hexFromHct(hue, 20, options.dark ? inverseTone(90) : 90)
+      colors[`${key}_surface_4`] = hexFromHct(hue, 20, options.dark ? inverseTone(85) : 85)
     }
   }
   return colors
 }
 
-export const createTheme = (file, options) => {
+export const createTheme = options => {
+  if (options.lightness) darkThemeExtraLightness = options.lightness
   const colors = createColors({
     dark: true,
-    lightness: 8,
     primary: '#00adff',
     blue: '#0091ff',
     skyblue: '#00adff',
     red: '#ff002b',
     green: '#00ffac',
     pink: '#ff00d9',
-    yellow: '#fff700',
+    yellow: '#ffee00',
     ...options
   })
   colors.transparent = '#ffffff00'
-
-  const theme = {
+  return {
     name: 'Material Code',
     type: 'dark',
     colors: {
       foreground: colors.neutral_20,
       'icon.foreground': colors.neutral_20,
+      'banner.iconForeground': colors.neutral_20,
       'textLink.foreground': colors.primary_40,
+      'textLink.activeForeground': colors.primary_40,
       errorForeground: colors.red_40,
       'selection.background': colors.primary_surface_4,
       focusBorder: colors.transparent,
       'sash.hoverBorder': colors.primary_40,
       'widget.shadow': colors.transparent,
 
-      'button.background': colors.primary_40,
       'button.foreground': colors.primary_surface,
+      'button.background': colors.primary_40,
+      'button.secondaryForeground': colors.primary_20,
       'button.secondaryBackground': colors.primary_surface_3,
-      'button.secondaryForeground': colors.primary_10,
+
+      'badge.background': colors.primary_40,
+      'badge.foreground': colors.primary_surface,
+      'activityBarBadge.background': colors.primary_40,
+      'activityBarBadge.foreground': colors.primary_surface,
 
       'checkbox.background': colors.transparent,
       'checkbox.foreground': colors.primary_40,
@@ -75,19 +77,18 @@ export const createTheme = (file, options) => {
 
       'input.background': colors.primary_surface_2,
       'input.placeholderForeground': colors.neutral_40,
-      'inputOption.activeBackground': colors.primary_surface_3,
-      'inputOption.activeForeground': colors.primary_10,
       'inputValidation.errorBackground': colors.error_surface_2,
-      'inputValidation.errorForeground': colors.red_10,
+      'inputValidation.errorForeground': colors.red_20,
       'inputValidation.errorBorder': colors.transparent,
+
+      'inputOption.activeBackground': colors.primary_40,
+      'inputOption.activeForeground': colors.primary_surface,
+      'inputOption.activeBorder': colors.transparent,
 
       'scrollbar.shadow': colors.transparent,
       'scrollbarSlider.background': colors.primary_surface_3,
       'scrollbarSlider.hoverBackground': colors.primary_surface_3,
       'scrollbarSlider.activeBackground': colors.primary_surface_3,
-
-      'badge.background': colors.primary_surface_3,
-      'badge.foreground': colors.primary_10,
 
       'list.hoverBackground': colors.primary_surface_3,
       'list.activeSelectionBackground': colors.primary_surface_3,
@@ -146,6 +147,10 @@ export const createTheme = (file, options) => {
 
       'editorGutter.foldingControlForeground': colors.neutral_40,
 
+      'editorGutter.modifiedBackground': colors.primary_40,
+      'editorGutter.addedBackground': colors.green_80,
+      'editorGutter.deletedBackground': colors.red_80,
+
       'diffEditor.diagonalFill': colors.primary_surface_4,
       'diffEditor.insertedTextBackground': colors.transparent,
       'diffEditor.removedTextBackground': colors.transparent,
@@ -171,6 +176,7 @@ export const createTheme = (file, options) => {
       'menu.separatorBackground': colors.transparent,
 
       'pickerGroup.border': colors.transparent,
+      'pickerGroup.foreground': colors.primary_40,
 
       'keybindingLabel.background': colors.primary_surface_3,
       'keybindingLabel.foreground': colors.neutral_20,
@@ -196,21 +202,26 @@ export const createTheme = (file, options) => {
       'editor.foreground': colors.neutral_20,
       'editorCursor.foreground': colors.neutral_20,
       'editor.lineHighlightBackground': colors.primary_surface_2,
-      'editor.selectionBackground': colors.primary_80,
+      'editor.selectionBackground': colors.primary_surface_3,
       'editor.wordHighlightBackground': colors.primary_80,
       'editor.findMatchBackground': colors.primary_80,
       'editor.findMatchHighlightBackground': colors.primary_80,
 
       'editorBracketMatch.background': colors.primary_80,
       'editorBracketMatch.border': colors.transparent,
+
       'editorBracketHighlight.foreground1': colors.pink_50,
       'editorBracketHighlight.foreground2': colors.yellow_40,
       'editorBracketHighlight.foreground3': colors.red_50,
-      'editorBracketHighlight.foreground4': colors.green_40,
-      'editorBracketPairGuide.activeBackground1': colors.pink_60,
-      'editorBracketPairGuide.activeBackground2': colors.yellow_60,
-      'editorBracketPairGuide.activeBackground3': colors.red_60,
-      'editorBracketPairGuide.activeBackground4': colors.green_60,
+      'editorBracketHighlight.foreground4': colors.green_50,
+      'editorBracketPairGuide.activeBackground1': colors.pink_50 + 90,
+      'editorBracketPairGuide.activeBackground2': colors.yellow_40 + 90,
+      'editorBracketPairGuide.activeBackground3': colors.red_50 + 90,
+      'editorBracketPairGuide.activeBackground4': colors.green_50 + 90,
+      'editorBracketPairGuide.background1': colors.pink_surface_4,
+      'editorBracketPairGuide.background2': colors.yellow_surface_4,
+      'editorBracketPairGuide.background3': colors.red_surface_4,
+      'editorBracketPairGuide.background4': colors.green_surface_4,
 
       'editorIndentGuide.activeBackground': colors.primary_surface_2,
       'editorIndentGuide.background': colors.transparent,
@@ -226,19 +237,26 @@ export const createTheme = (file, options) => {
       'editorWidget.border': colors.transparent,
       'editorSuggestWidget.selectedBackground': colors.primary_surface_3,
 
-      'peekView.border': colors.primary_40,
-      'peekViewEditor.background': colors.primary_surface_2,
-      'peekViewResult.background': colors.primary_surface_3,
+      'peekView.border': colors.transparent,
+
+      'peekViewTitle.background': colors.primary_surface_2,
       'peekViewTitleLabel.foreground': colors.primary_40,
       'peekViewTitleDescription.foreground': colors.neutral_20,
-      'peekViewEditor.matchHighlightBackground': colors.primary_90,
-      'peekViewResult.matchHighlightBackground': colors.primary_90,
+
+      'peekViewResult.background': colors.primary_surface_2,
+      'peekViewResult.matchHighlightBackground': colors.primary_80,
       'peekViewResult.selectionBackground': colors.primary_surface_3,
-      'peekViewResult.selectionForeground': colors.primary_10,
+      'peekViewResult.selectionForeground': colors.primary_20,
       'peekViewResult.lineforeground': colors.neutral_20,
+
+      'peekViewEditor.background': colors.primary_surface_2,
+      'peekViewEditor.matchHighlightBackground': colors.primary_80,
 
       'notificationCenterHeader.background': colors.primary_surface_3,
       'notifications.background': colors.primary_surface_3,
+      'notificationsInfoIcon.foreground': colors.primary_40,
+
+      'problemsInfoIcon.foreground': colors.primary_40,
 
       'settings.headerForeground': colors.primary_40,
       'settings.focusedRowBackground': colors.transparent,
