@@ -2,7 +2,7 @@ import injectCss from 'inline:./inject.css'
 import injectJs from 'inline:./inject.js'
 
 import vscode from 'vscode'
-import sudo from '@vscode/sudo-prompt' // todo: dynamic import
+import sudo from '@vscode/sudo-prompt' // todo: don't load if vscode.web.
 import { createTheme } from './theme.js'
 import { readFile, writeFile, errorNotification } from './utils.js'
 
@@ -142,7 +142,7 @@ module.exports.activate = async context => {
   const html = await readFile(workbenchFile)
   const hasCode = html.includes('material-code')
   if (enabled && !hasCode) {
-    vscode.window.showInformationMessage('Re-apply styles?', 'Ignore', 'Ok').then(action => {
+    vscode.window.showInformationMessage('Re-apply styles?', 'Ok', 'Ignore').then(action => {
       if (action == 'Ok') vscode.commands.executeCommand('material-code.applyStyles')
       if (action == 'Ignore') appData.set('styles_enabled', false)
     })
@@ -154,14 +154,13 @@ module.exports.activate = async context => {
     if (primaryColorChanged || lightnessChanged) {
       const options = { primary: settings.get('primaryColor') }
       if (lightnessChanged) options.lightness = settings.get('lightness')
-      await createTheme(context.extensionPath + '/themes/dark.json', options)
+
+      const theme = createTheme(options)
+      await writeFile(vscode.Uri.file(context.extensionPath + '/themes/dark.json'), JSON.stringify(theme))
+
       vscode.window.showInformationMessage('Theme updated. Reload window to see changes.', 'Reload').then(action => {
         if (action == 'Reload') vscode.commands.executeCommand('workbench.action.reloadWindow')
       })
     }
   })
-
-  if (process.env.DEV) createTheme(context.extensionPath + '/themes/dark.json')
 }
-
-module.exports.deactivate = () => {}

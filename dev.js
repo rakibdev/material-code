@@ -1,5 +1,16 @@
 import esbuild from 'esbuild'
 import inlineImport from 'esbuild-plugin-inline-import'
+import { createTheme } from './theme.js'
+
+const custom = {
+  name: 'custom',
+  setup(build) {
+    build.onEnd(() => {
+      const theme = createTheme({})
+      Bun.write('./themes/dark.json', JSON.stringify(theme))
+    })
+  }
+}
 
 const ctx = await esbuild[process.env.DEV ? 'context' : 'build']({
   entryPoints: ['extension.js'],
@@ -8,7 +19,7 @@ const ctx = await esbuild[process.env.DEV ? 'context' : 'build']({
   external: ['vscode'],
   format: 'cjs',
   platform: 'node',
-  plugins: [inlineImport()],
+  plugins: [inlineImport(), custom],
   minify: !process.env.DEV,
   legalComments: 'none',
   define: {

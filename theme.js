@@ -1,9 +1,8 @@
-import vscode from 'vscode'
 import { Hct, argbFromHex, hexFromArgb } from '@material/material-color-utilities'
-import { writeFile } from './utils'
+
+const hexFromHct = (hue, chroma, tone) => hexFromArgb(Hct.from(hue, chroma, tone).toInt())
 
 const createColors = options => {
-  const hexFromHct = (hue, chroma, tone) => hexFromArgb(Hct.from(hue, chroma, tone).toInt())
   const primary = Hct.fromInt(argbFromHex(options.primary))
   options.neutral = hexFromHct(primary.hue, 10, 40)
 
@@ -352,6 +351,4 @@ export const createTheme = (file, options) => {
       }
     ]
   }
-
-  return writeFile(vscode.Uri.file(file), JSON.stringify(theme))
 }
