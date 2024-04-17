@@ -87,13 +87,13 @@ const onApplyStylesCommand = async () => {
   updateInstallationFiles(html)
 }
 
-const isNewVersion = (current, previous) => {
-  current = current.split('.')
-  previous = previous.split('.')
-  for (let i = 0; i < current.length; i++) {
-    if (parseInt(current[i]) > parseInt(previous[i])) return true
-  }
-}
+// const isNewVersion = (current, previous) => {
+//   current = current.split('.')
+//   previous = previous.split('.')
+//   for (let i = 0; i < current.length; i++) {
+//     if (parseInt(current[i]) > parseInt(previous[i])) return true
+//   }
+// }
 
 module.exports.activate = async context => {
   appDataDir = context.globalStorageUri
@@ -148,19 +148,13 @@ module.exports.activate = async context => {
     })
   }
 
-  vscode.workspace.onDidChangeConfiguration(async event => {
+  vscode.workspace.onDidChangeConfiguration(event => {
     const primaryColorChanged = event.affectsConfiguration('material-code.primaryColor')
     const lightnessChanged = event.affectsConfiguration('material-code.lightness')
     if (primaryColorChanged || lightnessChanged) {
-      const options = { primary: settings.get('primaryColor') }
-      if (lightnessChanged) options.lightness = settings.get('lightness')
-
+      const options = { primary: settings.get('primaryColor'), lightness: settings.get('lightness') }
       const theme = createTheme(options)
-      await writeFile(vscode.Uri.file(context.extensionPath + '/themes/dark.json'), JSON.stringify(theme))
-
-      vscode.window.showInformationMessage('Theme updated. Reload window to see changes.', 'Reload').then(action => {
-        if (action == 'Reload') vscode.commands.executeCommand('workbench.action.reloadWindow')
-      })
+      writeFile(vscode.Uri.file(context.extensionPath + '/themes/dark.json'), JSON.stringify(theme))
     }
   })
 }

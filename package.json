@@ -33,7 +33,8 @@
       {
         "label": "Material Code",
         "uiTheme": "vs-dark",
-        "path": "./themes/dark.json"
+        "path": "./themes/dark.json",
+        "_watch": true
       }
     ],
     "configuration": {
@@ -43,15 +44,13 @@
           "type": "string",
           "default": "#00adff",
           "pattern": "^#([A-Fa-f0-9]{6})$",
-          "patternErrorMessage": "Use 6 digit hex format (e.g. #RRGGBB).",
-          "description": "Requires window reload."
+          "patternErrorMessage": "Invalid color."
         },
         "material-code.lightness": {
           "type": "number",
           "default": 8,
           "minimum": 0,
-          "maximum": 10,
-          "description": "Requires window reload."
+          "maximum": 10
         },
         "material-code.customCSS": {
           "type": "string",
@@ -81,8 +80,8 @@
     "@vscode/sudo-prompt": "^9.3.1"
   },
   "devDependencies": {
-    "@vscode/vsce": "^2.22.0",
+    "@vscode/vsce": "^2.25.0",
     "esbuild": "^0.19.11",
-    "esbuild-plugin-inline-import": "^1.0.2"
+    "esbuild-plugin-inline-import": "^1.0.4"
   }
 }
