@@ -1,11 +1,16 @@
 import esbuild from 'esbuild'
 import inlineImport from 'esbuild-plugin-inline-import'
-import { createTheme } from './theme.js'
 
 const custom = {
   name: 'custom',
   setup(build) {
-    build.onEnd(() => {
+    let lastModified = null
+    build.onEnd(async () => {
+      const file = Bun.file('theme.js')
+      if (lastModified == file.lastModified) return
+      lastModified = file.lastModified
+
+      const { createTheme } = await import(`./theme.js?version=${lastModified}`)
       const theme = createTheme({})
       Bun.write('./themes/dark.json', JSON.stringify(theme))
     })
