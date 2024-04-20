@@ -6,6 +6,7 @@ import sudo from '@vscode/sudo-prompt' // todo: don't load if vscode.web.
 import { createTheme } from './theme.js'
 import { readFile, writeFile, errorNotification } from './utils.js'
 
+// todo: improve markdown.
 // const isWeb = vscode.env.appHost != 'desktop'
 const vscodeRoot = vscode.Uri.file(vscode.env.appRoot)
 const workbenchFile = vscode.Uri.joinPath(vscodeRoot, 'out/vs/code/electron-sandbox/workbench/workbench.html')
@@ -95,6 +96,40 @@ const onApplyStylesCommand = async () => {
 //   }
 // }
 
+const getInstalledThemes = () => {
+  const result = {}
+  vscode.extensions.all.forEach(extension => {
+    const themes = extension.packageJSON.contributes?.themes
+    if (!themes) return
+    themes.forEach(theme => {
+      result[theme.label] = vscode.Uri.joinPath(vscode.Uri.file(extension.extensionPath), theme.path)
+    })
+  })
+  return result
+}
+
+const mergeSyntaxTheme = async (theme, syntaxThemeUri) => {
+  const syntaxTheme = JSON.parse(await readFile(syntaxThemeUri))
+  theme.tokenColors = syntaxTheme.tokenColors
+  for (const key in theme.colors) {
+    if (key.startsWith('editorBracket')) theme.colors[key] = syntaxTheme.colors[key]
+  }
+}
+
+const updateTheme = async uri => {
+  const theme = createTheme({ primary: settings.get('primaryColor'), lightness: settings.get('lightness') })
+
+  const syntaxName = settings.get('syntaxTheme')
+  if (syntaxName) {
+    const themes = getInstalledThemes()
+    const syntaxUri = themes[syntaxName]
+    if (syntaxUri) await mergeSyntaxTheme(theme, syntaxUri)
+    else return errorNotification(`Theme "${syntaxName}" not found.`)
+  }
+
+  return writeFile(uri, JSON.stringify(theme))
+}
+
 module.exports.activate = async context => {
   appDataDir = context.globalStorageUri
   packageJson = context.extension.packageJSON
@@ -131,7 +166,7 @@ module.exports.activate = async context => {
       // }
     } else {
       vscode.window
-        .showInformationMessage(`${packageJson.displayName} installed! See README?`, 'Open', 'Cancel')
+        .showInformationMessage(`${packageJson.displayName} installed!`, 'Open README', 'Cancel')
         .then(action => {
           if (action == 'Open') vscode.env.openExternal(vscode.Uri.parse(packageJson.repository.url))
         })
@@ -140,21 +175,19 @@ module.exports.activate = async context => {
 
   const enabled = appData.get('styles_enabled')
   const html = await readFile(workbenchFile)
-  const hasCode = html.includes('material-code')
-  if (enabled && !hasCode) {
+  const contains = html.includes('material-code')
+  if (enabled && !contains) {
     vscode.window.showInformationMessage('Re-apply styles?', 'Ok', 'Ignore').then(action => {
       if (action == 'Ok') vscode.commands.executeCommand('material-code.applyStyles')
       if (action == 'Ignore') appData.set('styles_enabled', false)
     })
   }
 
+  // todo: Create theme on install if modified settings exists.
+
   vscode.workspace.onDidChangeConfiguration(event => {
-    const primaryColorChanged = event.affectsConfiguration('material-code.primaryColor')
-    const lightnessChanged = event.affectsConfiguration('material-code.lightness')
-    if (primaryColorChanged || lightnessChanged) {
-      const options = { primary: settings.get('primaryColor'), lightness: settings.get('lightness') }
-      const theme = createTheme(options)
-      writeFile(vscode.Uri.file(context.extensionPath + '/themes/dark.json'), JSON.stringify(theme))
-    }
+    if (!event.affectsConfiguration('material-code') || event.affectsConfiguration('material-code.customCSS')) return
+    const themeUri = vscode.Uri.file(context.extensionPath + '/themes/editor.json')
+    updateTheme(themeUri)
   })
 }

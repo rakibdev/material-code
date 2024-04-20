@@ -12,7 +12,7 @@ const custom = {
 
       const { createTheme } = await import(`./theme.js?version=${lastModified}`)
       const theme = createTheme({})
-      Bun.write('./themes/dark.json', JSON.stringify(theme))
+      Bun.write('./themes/editor.json', JSON.stringify(theme))
     })
   }
 }

@@ -33,7 +33,7 @@
       {
         "label": "Material Code",
         "uiTheme": "vs-dark",
-        "path": "./themes/dark.json",
+        "path": "./themes/editor.json",
         "_watch": true
       }
     ],
@@ -54,7 +54,11 @@
         },
         "material-code.customCSS": {
           "type": "string",
-          "markdownDescription": "Run `Material Code: Apply styles` from command palette after editing."
+          "markdownDescription": "Select **Command Palette > Material Code: Apply styles** after modification."
+        },
+        "material-code.syntaxTheme": {
+          "type": "string",
+          "markdownDescription": "Select **Command Palette > Preferences: Color Theme** to view available themes."
         }
       }
     },
