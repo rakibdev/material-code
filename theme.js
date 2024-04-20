@@ -209,9 +209,6 @@ export const createTheme = options => {
       'editorBracketMatch.background': colors.primary_40 + 40,
       'editorBracketMatch.border': colors.transparent,
 
-      'editorStickyScroll.background': colors.primary_surface + 80,
-      'editorStickyScrollHover.background': colors.primary_surface_2,
-
       'editorBracketHighlight.foreground1': colors.pink_50,
       'editorBracketHighlight.foreground2': colors.yellow_40,
       'editorBracketHighlight.foreground3': colors.red_50,
@@ -279,7 +276,11 @@ export const createTheme = options => {
       'breadcrumb.foreground': colors.neutral_40,
       'breadcrumb.focusforeground': colors.neutral_20,
       'breadcrumb.activeSelectionforeground': colors.neutral_20,
-      'breadcrumbPicker.background': colors.primary_surface_2
+      'breadcrumbPicker.background': colors.primary_surface_2,
+
+      'editorStickyScroll.background': colors.primary_surface + 80,
+      'editorStickyScrollHover.background': colors.primary_surface_2,
+      'outputView.background': colors.primary_surface + 80
     },
     tokenColors: [
       {

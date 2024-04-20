@@ -9,6 +9,7 @@
 - Rounded corners.
 - Ripple effect.
 - Custom CSS.
+- Separate syntax theme.
 
 Let me know your suggestions, issues on [Github](https://github.com/rakibdev/material-code/issues)
 
@@ -33,14 +34,14 @@ In rare cases like [this](https://github.com/rakibdev/material-code/issues/2) wh
 - Remove all code inside "<--material-code-->" block and save.
 - To fix "Installation corrupted" warning, use [Fix VSCode Checksums](https://marketplace.visualstudio.com/items?itemName=lehni.vscode-fix-checksums) extension.
 
-### Custom CSS setting
+### Custom CSS
 
 You can define as many rules you want in "Custom CSS" input.
 
-Change whole UI font<br>
+**Change whole UI font**<br>
 `.mac, .windows, .linux { font-family: Google Sans; }`
 
-Change rounded corner radius<br>
+**Change rounded corner radius**<br>
 `body { --radius: 8px; }`
 
 ### Other settings you may like
