@@ -200,14 +200,13 @@ export const createTheme = options => {
 
       'editor.background': colors.primary_surface,
       'editor.foreground': colors.neutral_20,
-      'editorCursor.foreground': colors.neutral_20,
-      'editor.lineHighlightBackground': colors.primary_surface_2,
+      'editor.lineHighlightBackground': colors.primary_40 + 10,
       'editor.selectionBackground': colors.primary_surface_3,
       'editor.wordHighlightBackground': colors.primary_80,
       'editor.findMatchBackground': colors.primary_80,
       'editor.findMatchHighlightBackground': colors.primary_80,
-
-      'editorBracketMatch.background': colors.primary_80,
+      'editorCursor.foreground': colors.neutral_20,
+      'editorBracketMatch.background': colors.primary_40 + 40,
       'editorBracketMatch.border': colors.transparent,
 
       'editorStickyScroll.background': colors.primary_surface + 80,
@@ -290,7 +289,6 @@ export const createTheme = options => {
           'keyword',
           'keyword.other.unit',
           'constant.other',
-
           'comment',
           'punctuation.definition.comment'
         ],
