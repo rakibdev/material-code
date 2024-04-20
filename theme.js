@@ -210,6 +210,9 @@ export const createTheme = options => {
       'editorBracketMatch.background': colors.primary_80,
       'editorBracketMatch.border': colors.transparent,
 
+      'editorStickyScroll.background': colors.primary_surface + 80,
+      'editorStickyScrollHover.background': colors.primary_surface_2,
+
       'editorBracketHighlight.foreground1': colors.pink_50,
       'editorBracketHighlight.foreground2': colors.yellow_40,
       'editorBracketHighlight.foreground3': colors.red_50,
