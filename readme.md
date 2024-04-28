@@ -6,48 +6,65 @@
 ## Features
 
 - Material You.
-- Rounded corners.
-- Ripple effect.
 - Custom CSS.
+- Rounded corners.
+- Click ripple effect.
 - Separate syntax theme.
+- Follow system theme e.g. [Mutagen](https://github.com/InioX/matugen), [Pywal](https://github.com/dylanaraps/pywal).
 
 Let me know your suggestions, issues on [Github](https://github.com/rakibdev/material-code/issues)
 
 ## Usage
 
-Material You theme works straight away.
+Material You theming works straight away.
 
-Other features requires running "Material Code: Apply styles" from command palette, which injects custom code into vscode installation file "workbench.html". Therefore extension may ask for administrative privileges if needed.
+Other features requires running **Material Code: Apply styles** from command palette, which injects code into vscode installation file **workbench.html**. Therefore extension may ask for administrative privileges if needed.
 
-After applying vscode will warn "Installation corrupted" notification. This can be safely ignored, click notification gear icon > "Don't show again".
+After applying vscode will warn "Installation corrupted". This can be safely ignored. Click notification gear icon > **Don't show again**.
 
-To remove styles run "Material Code: Remove styles" from command palette which reverts "workbench.html" to original.
+And to revert run **Material Code: Remove styles**.
+
+### Follow system theme
+
+Extension's folder, in my case located inside `~/.vscode-insiders/extensions` includes a file named **theme.js**. This file exports functions to update theme programmatically, outside VS Code. I wrote a script [vscode.js](home/rakib/Downloads/apps-script/theme/vscode.js) to automate the process. It reads colors from a file (custom color generator, I don't use Pywal) and applies them. Edit the file according to your system before using.
 
 ## Help
 
 ### Revert original files manually
 
-In rare cases like [this](https://github.com/rakibdev/material-code/issues/2) where "Material Code: Remove styles" not working. Generally updating vscode version will revert itself including the styles. But if you need fix urgent:
+In rare cases like [this](https://github.com/rakibdev/material-code/issues/2) where "Material Code: Remove styles" not working. Generally updating vscode version will revert itself including the styles but if you need fix urgent:
 
-- Open "workbench.html" file located in vscode installation folder.
-  In my case (Linux) it's "/opt/visual-studio-code-insiders/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html"
-- Remove all code inside "<--material-code-->" block and save.
+- Open **workbench.html** file located in vscode installation folder.
+  In my case (Linux) it's `/opt/visual-studio-code-insiders/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html`
+- Remove all code inside `<--material-code-->` block and save.
 - To fix "Installation corrupted" warning, use [Fix VSCode Checksums](https://marketplace.visualstudio.com/items?itemName=lehni.vscode-fix-checksums) extension.
 
 ### Custom CSS
 
-You can define as many rules you want in "Custom CSS" input.
+**Change VS Code font**<br>
 
-**Change whole UI font**<br>
-`.mac, .windows, .linux { font-family: Google Sans; }`
+```css
+.mac,
+.windows,
+.linux {
+  font-family: Google Sans;
+}
+```
 
 **Change rounded corner radius**<br>
-`body { --radius: 8px; }`
 
-### Other settings you may like
+```css
+body {
+  --radius: 8px;
+}
+```
 
-`"editor.semanticHighlighting.enabled": true`<br>
-`"window.dialogStyle": "custom"`<br>
-`"window.menuBarVisibility": "hidden"` (Use command palette)
+### Settings you may like
 
-My vscode [settings.json](https://github.com/rakibdev/dotfiles/blob/main/home/rakib/.config/Code%20-%20Insiders/User/settings.json)
+```json
+"editor.semanticHighlighting.enabled": true,
+"window.dialogStyle": "custom",
+"window.menuBarVisibility": "hidden" // I'm using command palette instead.
+```
+
+My [settings.json](https://github.com/rakibdev/dotfiles/blob/main/home/rakib/.config/Code%20-%20Insiders/User/settings.json)
