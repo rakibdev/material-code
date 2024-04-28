@@ -29,3 +29,12 @@ export const errorNotification = message => {
     }
   })
 }
+
+export const deepMerge = (target, source) => {
+  for (const key in source) {
+    const value = source[key]
+    if (Array.isArray(value) && Array.isArray(target[key])) target[key].push(...value)
+    else if (typeof value == 'object' && typeof target[key] == 'object') deepMerge(target[key], value)
+    else target[key] = value
+  }
+}

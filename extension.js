@@ -3,10 +3,12 @@ import injectJs from 'inline:./inject.js'
 
 import vscode from 'vscode'
 import sudo from '@vscode/sudo-prompt' // todo: don't load if vscode.web.
-import { createTheme } from './theme.js'
-import { readFile, writeFile, errorNotification } from './utils.js'
+import { dirname } from 'path'
+import { readFile, writeFile, errorNotification, deepMerge } from './utils.js'
 
-// todo: improve markdown.
+const { createMaterialColors, createTheme } = require('./theme.js')
+
+// todo: Improve markdown highlighting.
 // const isWeb = vscode.env.appHost != 'desktop'
 const vscodeRoot = vscode.Uri.file(vscode.env.appRoot)
 const workbenchFile = vscode.Uri.joinPath(vscodeRoot, 'out/vs/code/electron-sandbox/workbench/workbench.html')
@@ -108,23 +110,41 @@ const getInstalledThemes = () => {
   return result
 }
 
+const readTheme = async (uri, parent = {}) => {
+  let content = null
+  try {
+    content = JSON.parse(await readFile(uri))
+  } catch {
+    return parent
+  }
+  if (content.include) {
+    const includeUri = vscode.Uri.joinPath(vscode.Uri.file(dirname(uri.path)), content.include)
+    content = await readTheme(includeUri, content)
+  }
+  deepMerge(content, parent)
+  return content
+}
+
 const mergeSyntaxTheme = async (theme, syntaxThemeUri) => {
-  const syntaxTheme = JSON.parse(await readFile(syntaxThemeUri))
+  const syntaxTheme = await readTheme(syntaxThemeUri)
   theme.tokenColors = syntaxTheme.tokenColors
+  theme.semanticTokenColors = syntaxTheme.semanticTokenColors
   for (const key in theme.colors) {
-    if (key.startsWith('editorBracket')) theme.colors[key] = syntaxTheme.colors[key]
+    if (key.startsWith('editorBracket')) theme.colors[key] = syntaxTheme.colors?.[key]
   }
 }
 
 const updateTheme = async uri => {
-  const theme = createTheme({ primary: settings.get('primaryColor'), lightness: settings.get('lightness') })
+  const colors = createMaterialColors({ primary: settings.get('primaryColor') })
+  const theme = createTheme(colors)
 
+  // todo: Add light theme and adapt syntax theme.
   const syntaxName = settings.get('syntaxTheme')
   if (syntaxName) {
     const themes = getInstalledThemes()
     const syntaxUri = themes[syntaxName]
     if (syntaxUri) await mergeSyntaxTheme(theme, syntaxUri)
-    else return errorNotification(`Theme "${syntaxName}" not found.`)
+    else return errorNotification(`Syntax theme "${syntaxName}" not found.`)
   }
 
   return writeFile(uri, JSON.stringify(theme))
@@ -183,11 +203,9 @@ module.exports.activate = async context => {
     })
   }
 
-  // todo: Create theme on install if modified settings exists.
-
   vscode.workspace.onDidChangeConfiguration(event => {
     if (!event.affectsConfiguration('material-code') || event.affectsConfiguration('material-code.customCSS')) return
-    const themeUri = vscode.Uri.file(context.extensionPath + '/themes/editor.json')
+    const themeUri = vscode.Uri.file(context.extensionPath + '/build/theme.json')
     updateTheme(themeUri)
   })
 }
