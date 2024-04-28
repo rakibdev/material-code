@@ -26,7 +26,7 @@ And to revert run **Material Code: Remove styles**.
 
 ### Follow system theme
 
-Extension's folder, in my case located inside `~/.vscode-insiders/extensions` includes a file named **theme.js**. This file exports functions to update theme programmatically, outside VS Code. I wrote a script [vscode.js](home/rakib/Downloads/apps-script/theme/vscode.js) to automate the process. It reads colors from a file (custom color generator, I don't use Pywal) and applies them. Edit the file according to your system before using.
+Extension's folder, in my case located inside `~/.vscode-insiders/extensions` includes a file named **theme.js**. This file exports functions to update theme programmatically, outside VS Code. I wrote a script [vscode.js](https://github.com/rakibdev/dotfiles/blob/main/home/rakib/Downloads/apps-script/theme/vscode.js) to automate the process. It reads colors from a file (custom color generator, I don't use Pywal) and applies them. Edit the file according to your system before using.
 
 ## Help
 
