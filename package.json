@@ -1,8 +1,8 @@
 {
   "name": "material-code",
   "displayName": "Material Code",
-  "description": "Dark theme for Visual Studio Code.",
-  "version": "2.5.8",
+  "description": "Dynamic theme for Visual Studio Code.",
+  "version": "2.6.0",
   "publisher": "rakib13332",
   "author": "Rakib",
   "icon": "icon.png",
@@ -19,9 +19,9 @@
   ],
   "keywords": [
     "material",
-    "dark theme"
+    "theme"
   ],
-  "main": "./main.build.js",
+  "main": "build/extension.js",
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -33,7 +33,7 @@
       {
         "label": "Material Code",
         "uiTheme": "vs-dark",
-        "path": "./themes/editor.json",
+        "path": "build/theme.json",
         "_watch": true
       }
     ],
@@ -46,15 +46,9 @@
           "pattern": "^#([A-Fa-f0-9]{6})$",
           "patternErrorMessage": "Invalid color."
         },
-        "material-code.lightness": {
-          "type": "number",
-          "default": 8,
-          "minimum": 0,
-          "maximum": 10
-        },
         "material-code.customCSS": {
           "type": "string",
-          "markdownDescription": "Select **Command Palette > Material Code: Apply styles** after modification."
+          "markdownDescription": "Select **Command Palette > Material Code: Apply styles** after editing."
         },
         "material-code.syntaxTheme": {
           "type": "string",

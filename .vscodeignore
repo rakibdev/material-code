@@ -1,10 +1,6 @@
-node_modules/
-bun.lockb
-*.vsix
+**
 
-.gitignore
-**/*.js
-**/*.css
-screenshots/
-
-!main.build.js
+!build/
+!icon.png
+!package.json
+!readme.md

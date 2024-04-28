@@ -10,26 +10,24 @@ const custom = {
       if (lastModified == file.lastModified) return
       lastModified = file.lastModified
 
-      const { createTheme } = await import(`./theme.js?version=${lastModified}`)
-      const theme = createTheme({})
-      Bun.write('./themes/editor.json', JSON.stringify(theme))
+      const { createMaterialColors, createTheme } = await import(`./theme.js?version=${lastModified}`)
+      const theme = createTheme(createMaterialColors())
+      Bun.write('build/theme.json', JSON.stringify(theme))
     })
   }
 }
 
 const ctx = await esbuild[process.env.DEV ? 'context' : 'build']({
-  entryPoints: ['extension.js'],
-  outfile: 'main.build.js',
-  bundle: true,
-  external: ['vscode'],
+  entryPoints: ['extension.js', 'theme.js'],
+  outdir: 'build',
   format: 'cjs',
   platform: 'node',
+  // Keep "./" of "./theme.js" as it must exactly match import path.
+  external: ['vscode', './theme.js'],
   plugins: [inlineImport(), custom],
   minify: !process.env.DEV,
-  legalComments: 'none',
-  define: {
-    'process.env.DEV': `${process.env.DEV}`
-  }
+  bundle: true,
+  legalComments: 'none'
 })
 
 if (process.env.DEV) ctx.watch()
