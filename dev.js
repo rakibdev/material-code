@@ -1,6 +1,12 @@
 import esbuild from 'esbuild'
 import inlineImport from 'esbuild-plugin-inline-import'
 
+const generateTheme = async version => {
+  const { createMaterialColors, createTheme } = await import(`./theme.js?version=${version}`)
+  const theme = createTheme(createMaterialColors())
+  Bun.write('build/theme.json', JSON.stringify(theme))
+}
+
 const custom = {
   name: 'custom',
   setup(build) {
@@ -9,10 +15,7 @@ const custom = {
       const file = Bun.file('theme.js')
       if (lastModified == file.lastModified) return
       lastModified = file.lastModified
-
-      const { createMaterialColors, createTheme } = await import(`./theme.js?version=${lastModified}`)
-      const theme = createTheme(createMaterialColors())
-      Bun.write('build/theme.json', JSON.stringify(theme))
+      generateTheme(file.lastModified)
     })
   }
 }
@@ -31,3 +34,4 @@ const ctx = await esbuild[process.env.DEV ? 'context' : 'build']({
 })
 
 if (process.env.DEV) ctx.watch()
+else generateTheme()
