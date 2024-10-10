@@ -1,14 +1,13 @@
 ![Material Code Editor](https://raw.githubusercontent.com/rakibdev/material-code/main/screenshots/editor.png)
 ![Material Code Settings](https://raw.githubusercontent.com/rakibdev/material-code/main/screenshots/settings.png)
-
-> Apple's SF Mono font used in screenshots
+![Material Code Settings](https://raw.githubusercontent.com/rakibdev/material-code/main/screenshots/light-theme.png)
 
 ## Features
 
 - Material You (Dark & Light).
-- Custom CSS.
 - Rounded corners.
 - Click ripple effect.
+- Inject inline CSS, JavaScript, HTML.
 - Separate syntax theme.
 - Follow system theme e.g. [Mutagen](https://github.com/InioX/matugen), [Pywal](https://github.com/dylanaraps/pywal).
 

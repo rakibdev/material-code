@@ -154,7 +154,6 @@ export const activate = async (context: vscode.ExtensionContext) => {
       event.affectsConfiguration('material-code.primaryColor') ||
       event.affectsConfiguration('material-code.syntaxTheme')
     ) {
-      console.log('primary ', settings().get('primaryColor'))
       updateThemeVariants()
     }
   })
