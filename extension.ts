@@ -68,7 +68,7 @@ const normalizeInlineHtml = (code: string) => {
 }
 
 const onCommandApplyStyles = async () => {
-  const inject = settings.get<string[]>('inject', [])
+  const inject = settings().get<string[]>('inject', [])
   let code = ''
 
   for (const content of inject) {
@@ -111,10 +111,10 @@ const mergeSyntaxTheme = async (theme: Theme, syntaxThemeUri: vscode.Uri) => {
 }
 
 const saveTheme = async (themeUri: vscode.Uri, darkMode: boolean) => {
-  const colors = createMaterialColors({ darkMode, colors: { primary: settings.get('primaryColor') } })
+  const colors = createMaterialColors({ darkMode, colors: { primary: settings().get('primaryColor') } })
   const theme = createTheme(colors)
 
-  const syntaxThemeName = settings.get<string>('syntaxTheme')
+  const syntaxThemeName = settings().get<string>('syntaxTheme')
   if (syntaxThemeName) {
     const themes = getInstalledThemes()
     const syntaxThemeUri = themes[syntaxThemeName]
@@ -154,6 +154,7 @@ export const activate = async (context: vscode.ExtensionContext) => {
       event.affectsConfiguration('material-code.primaryColor') ||
       event.affectsConfiguration('material-code.syntaxTheme')
     ) {
+      console.log('primary ', settings().get('primaryColor'))
       updateThemeVariants()
     }
   })
