@@ -1,9 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "include": ["./theme/theme.ts"],
-  "compilerOptions": {
-    "declaration": true,
-    "emitDeclarationOnly": true,
-    "declarationDir": "./build"
-  }
-}

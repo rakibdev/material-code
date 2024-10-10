@@ -1,7 +1,6 @@
 **
 
 !build/
-!theme/
 !icon.png
 !package.json
 !readme.md

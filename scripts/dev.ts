@@ -18,7 +18,7 @@ const themeGenerator: Plugin = {
   setup(build) {
     const generate = async () => {
       const { createTheme, createMaterialColors } = (await importUncached(
-        `../${options.outdir}/theme/theme.js`
+        `../theme/theme`
       )) as typeof import('../theme/theme')
 
       await Bun.write(`${options.outdir}/dark.json`, JSON.stringify(createTheme(createMaterialColors())))
@@ -41,13 +41,13 @@ const themeGenerator: Plugin = {
 
 const extension: BuildOptions = {
   ...options,
-  entryPoints: ['extension.ts', './theme/theme.ts'],
+  entryPoints: ['extension.ts'],
   format: 'cjs',
   platform: 'node',
   plugins: [themeGenerator],
   sourcemap: process.env.DEV ? 'inline' : undefined,
   // External path must exactly march the import path.
-  external: ['vscode', './theme/theme']
+  external: ['vscode']
 }
 
 const inject: BuildOptions = {

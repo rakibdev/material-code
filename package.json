@@ -99,8 +99,7 @@
   },
   "scripts": {
     "dev": "export DEV=true && bun ./scripts/dev.ts",
-    "build": "bun ./scripts/dev.ts && bun build:types && yes | vsce package --no-dependencies",
-    "build:types": "tsc --project ./tsconfig.types.json",
+    "build": "bun ./scripts/dev.ts && yes | vsce package --no-dependencies",
     "release": "bun ./scripts/release.ts && xdg-open https://marketplace.visualstudio.com/manage"
   },
   "dependencies": {
@@ -108,11 +107,10 @@
     "@vscode/sudo-prompt": "^9.3.1"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "@types/vscode": "^1.75.0",
-    "@vscode/vsce": "^2.25.0",
-    "esbuild": "^0.19.11",
-    "typescript": "^5.5.4"
+    "@types/bun": "^1.1.11",
+    "@types/vscode": "1.75.0",
+    "@vscode/vsce": "^3.1.1",
+    "esbuild": "^0.24.0"
   },
   "patchedDependencies": {
     "@material/material-color-utilities@0.3.0": "patches/@material%2Fmaterial-color-utilities@0.3.0.patch"
