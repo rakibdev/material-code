@@ -24,7 +24,7 @@ export const normalizeInjectPath = (path: string) => {
 
   if (path[0] == '~') {
     const home = process.env.HOME || process.env.USERPROFILE
-    uri = vscode.Uri.joinPath(home, path.substring(1))
+    uri = vscode.Uri.joinPath(vscode.Uri.file(home), path.substring(1))
   }
 
   return uri

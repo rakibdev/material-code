@@ -1,7 +1,7 @@
-import * as vscode from 'vscode'
+import vscode from 'vscode'
 import { normalizeInjectPath, readFile, writeFile } from './utils/file'
 import { errorNotification } from './utils/extension'
-import { buildDir, packageJson, settings } from './utils/config'
+import { buildDir, extensionUri, packageJson, settings } from './utils/config'
 import { AppData } from './utils/appdata'
 import { createTheme, type Theme, createMaterialColors } from './theme/theme'
 import { getInstalledThemes, readTheme } from './utils/theme'
@@ -61,24 +61,37 @@ const onCommandRemoveStyles = async () => {
   saveWorkbench(clearInjection(html))
 }
 
+const normalizeInlineHtml = (code: string) => {
+  if (/^<[^>]+>/.test(code)) return code
+  const isCss = /\{[^}]+:[^}]+\}/.test(code)
+  return `<${isCss ? 'style' : 'script'}>${code}</${isCss ? 'style' : 'script'}>`
+}
+
 const onCommandApplyStyles = async () => {
   const inject = settings.get<string[]>('inject', [])
-
   let code = ''
+
   for (const content of inject) {
     const isFile = content.endsWith('.css') || content.endsWith('.js')
-    if (isFile) {
-      const uri = normalizeInjectPath(content)
-      const uriWithSchema = uri.with({ scheme: 'vscode-file', authority: 'vscode-app' })
-      try {
-        await vscode.workspace.fs.stat(uri)
+    if (!isFile) {
+      code += normalizeInlineHtml(content)
+      continue
+    }
+
+    const uri = normalizeInjectPath(content)
+    try {
+      await vscode.workspace.fs.stat(uri)
+      const corsBlocked = !uri.fsPath.startsWith(extensionUri.fsPath)
+      if (corsBlocked) code += normalizeInlineHtml(await readFile(uri))
+      else {
+        const withSchema = uri.with({ scheme: 'vscode-file', authority: 'vscode-app' })
         code += content.endsWith('.css')
-          ? `\n<link rel="stylesheet" href="${uriWithSchema.toString()}">\n`
-          : `\n<script src="${uriWithSchema.toString()}"></script>\n`
-      } catch (error: any) {
-        errorNotification(`Inject "${uri}" file not found. Skipping.`)
+          ? `\n<link rel="stylesheet" href="${withSchema.toString()}">\n`
+          : `\n<script src="${withSchema.toString()}"></script>\n`
       }
-    } else code += content
+    } catch (error: any) {
+      errorNotification(`Skipping injection ${uri}: ${error.message}`)
+    }
   }
 
   let html = await readFile(workbenchFile)

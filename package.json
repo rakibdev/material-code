@@ -61,8 +61,10 @@
           "examples": [
             "~/Downloads/custom.css",
             "C:/Users/rakib/Downloads/custom.css",
+            "body { ... }",
             "<style>...</style>",
-            "<script>...</script>"
+            "<script>...</script>",
+            "<div>...</div><style>...</style>"
           ],
           "items": {
             "type": "string"

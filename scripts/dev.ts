@@ -8,7 +8,7 @@ const options: BuildOptions = {
 }
 
 const importUncached = (module: string) => {
-  const path = Bun.resolveSync(module, process.cwd())
+  const path = Bun.resolveSync(module, import.meta.dir)
   delete require.cache[path]
   return import(path)
 }
@@ -18,7 +18,7 @@ const themeGenerator: Plugin = {
   setup(build) {
     const generate = async () => {
       const { createTheme, createMaterialColors } = (await importUncached(
-        `./${options.outdir}/theme/theme.js`
+        `../${options.outdir}/theme/theme.js`
       )) as typeof import('../theme/theme')
 
       await Bun.write(`${options.outdir}/dark.json`, JSON.stringify(createTheme(createMaterialColors())))
