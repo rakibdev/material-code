@@ -5,7 +5,7 @@
 
 ## Features
 
-- Material You.
+- Material You (Dark & Light).
 - Custom CSS.
 - Rounded corners.
 - Click ripple effect.
@@ -26,7 +26,7 @@ And to revert run **Material Code: Remove styles**.
 
 ### Follow system theme
 
-Extension's folder, in my case located inside `~/.vscode-insiders/extensions` includes a file named **theme.js**. This file exports functions to update theme programmatically, outside VS Code. I wrote a script [vscode.js](https://github.com/rakibdev/dotfiles/blob/main/home/rakib/Downloads/apps-script/theme/vscode.js) to automate the process. It reads colors from a file (custom color generator, I don't use Pywal) and applies them. Edit the file according to your system before using.
+Material Code's installation directory (e.g. `~/.vscode-insiders/extensions/rakib13332.material-code.../build/theme.js`). The **theme.js** file exports functions to control theme programmatically outside VS Code. So call these whenever your system theme changes. I use shell scripts to apply system-wide GTK and VS Code theme at once, see [vscode.js](https://github.com/rakibdev/dotfiles/blob/main/home/rakib/Downloads/apps-script/theme/vscode.js). Edit according to your system before using.
 
 ## Help
 
@@ -59,7 +59,10 @@ body {
 }
 ```
 
-### Settings you may like
+** Change background **<br>
+// todo:
+
+### Settings you might like
 
 ```json
 "editor.semanticHighlighting.enabled": true,

@@ -2,7 +2,7 @@
   "name": "material-code",
   "displayName": "Material Code",
   "description": "Dynamic theme for Visual Studio Code.",
-  "version": "2.6.1",
+  "version": "3.0.0",
   "publisher": "rakib13332",
   "author": "Rakib",
   "icon": "icon.png",
@@ -21,7 +21,7 @@
     "material",
     "theme"
   ],
-  "main": "build/extension.js",
+  "main": "./build/extension.js",
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -33,7 +33,13 @@
       {
         "label": "Material Code",
         "uiTheme": "vs-dark",
-        "path": "build/theme.json",
+        "path": "./build/dark.json",
+        "_watch": true
+      },
+      {
+        "label": "Material Code Light",
+        "uiTheme": "vs",
+        "path": "./build/light.json",
         "_watch": true
       }
     ],
@@ -46,12 +52,28 @@
           "pattern": "^#([A-Fa-f0-9]{6})$",
           "patternErrorMessage": "Invalid color."
         },
-        "material-code.customCSS": {
-          "type": "string",
+        "material-code.inject": {
+          "type": "array",
+          "default": [
+            "${extensionDir}/build/inject.css",
+            "${extensionDir}/build/inject.js"
+          ],
+          "examples": [
+            "~/Downloads/custom.css",
+            "C:/Users/rakib/Downloads/custom.css",
+            "<style>...</style>",
+            "<script>...</script>"
+          ],
+          "items": {
+            "type": "string"
+          },
           "markdownDescription": "Select **Command Palette > Material Code: Apply styles** after editing."
         },
         "material-code.syntaxTheme": {
           "type": "string",
+          "examples": [
+            "Dark Modern"
+          ],
           "markdownDescription": "Select **Command Palette > Preferences: Color Theme** to view available themes."
         }
       }
@@ -67,19 +89,30 @@
       }
     ]
   },
+  "exports": {
+    "theme": {
+      "import": "./build/theme/theme.js",
+      "types": "./build/theme/theme.d.ts"
+    }
+  },
   "scripts": {
-    "preview": "code-insiders --extensionDevelopmentPath=/home/rakib/Downloads/material-code",
-    "dev": "export DEV=true && bun dev.js",
-    "build": "bun dev.js",
-    "release": "bun run build && bun github-release.js && vsce package --no-dependencies && xdg-open https://marketplace.visualstudio.com/manage"
+    "dev": "export DEV=true && bun ./scripts/dev.ts",
+    "build": "bun ./scripts/dev.ts && bun build:types && yes | vsce package --no-dependencies",
+    "build:types": "tsc --project ./tsconfig.types.json",
+    "release": "bun ./scripts/release.ts && xdg-open https://marketplace.visualstudio.com/manage"
   },
   "dependencies": {
-    "@material/material-color-utilities": "^0.2.7",
+    "@material/material-color-utilities": "0.3.0",
     "@vscode/sudo-prompt": "^9.3.1"
   },
   "devDependencies": {
+    "@types/bun": "latest",
+    "@types/vscode": "^1.75.0",
     "@vscode/vsce": "^2.25.0",
     "esbuild": "^0.19.11",
-    "esbuild-plugin-inline-import": "^1.0.4"
+    "typescript": "^5.5.4"
+  },
+  "patchedDependencies": {
+    "@material/material-color-utilities@0.3.0": "patches/@material%2Fmaterial-color-utilities@0.3.0.patch"
   }
 }

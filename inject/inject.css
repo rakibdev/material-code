@@ -68,5 +68,4 @@ select,
   opacity: 0.19;
   border-radius: 50%;
   position: absolute;
-  -webkit-mask-image: radial-gradient(closest-side, #fff 65%, transparent);
 }

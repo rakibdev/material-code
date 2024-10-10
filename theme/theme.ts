@@ -1,69 +1,17 @@
-import { Hct, argbFromHex, hexFromArgb } from '@material/material-color-utilities'
+import type { themeDefaults } from './config'
+import type { MaterialColors } from './colors'
 
-const hexFromHct = (hue, chroma, tone) => hexFromArgb(Hct.from(hue, chroma, tone).toInt())
+export { createMaterialColors } from './colors'
 
-const maxLightness = 99
-const inverseTone = tone => {
-  const extraLightness = 8
-  return Math.min(100 - tone + extraLightness, maxLightness)
-}
-
-const defaultOptions = {
-  dark: true,
-  primary: '#00adff',
-
-  // Syntax colors.
-  blue: '#0091ff',
-  skyblue: '#00adff',
-  red: '#ff002b',
-  green: '#00ffac',
-  pink: '#ff00d9',
-  yellow: '#ffee00'
-}
-
-/**
- * @typedef {Object.<string, string>} MaterialColors
- * @returns {MaterialColors}
- */
-export const createMaterialColors = options => {
-  options = Object.assign(defaultOptions, options)
-
-  const primary = Hct.fromInt(argbFromHex(options.primary))
-  options.neutral = hexFromHct(primary.hue, 8, 40)
-
-  const colors = {}
-  for (const [key, value] of Object.entries(options)) {
-    const isColor = typeof value == 'string' && value.startsWith('#')
-    if (!isColor) continue
-
-    const { hue, chroma } = Hct.fromInt(argbFromHex(value))
-    const tones = [80, 50, 40, 20]
-    tones.forEach(tone => {
-      colors[`${key}_${tone}`] = hexFromHct(hue, chroma, options.dark ? inverseTone(tone) : tone)
-    })
-    if (key != 'neutral') {
-      colors[`${key}_surface`] = hexFromHct(hue, 8, options.dark ? 8 : maxLightness)
-      colors[`${key}_surface_2`] = hexFromHct(hue, 14, options.dark ? inverseTone(94) : 94)
-      colors[`${key}_surface_3`] = hexFromHct(hue, 18, options.dark ? inverseTone(88) : 88)
-      colors[`${key}_surface_4`] = hexFromHct(hue, 20, options.dark ? inverseTone(84) : 84)
-    }
-  }
-  return colors
-}
-
-/**
- * @param {MaterialColors} colors
- * @returns {Object} VS Code theme.
- */
-export const createTheme = colors => {
+export const createTheme = (colors: MaterialColors<(typeof themeDefaults)['colors']>) => {
   const transparent = '#ffffff00'
   return {
     name: 'Material Code',
     colors: {
-      foreground: colors.neutral_20,
-      'icon.foreground': colors.neutral_20,
       'banner.iconForeground': colors.neutral_20,
       'textLink.foreground': colors.primary_40,
+      foreground: colors.neutral_20,
+      'icon.foreground': colors.neutral_20,
       'textLink.activeForeground': colors.primary_40,
       errorForeground: colors.red_40,
       'selection.background': colors.primary_surface_4,
@@ -89,7 +37,7 @@ export const createTheme = colors => {
 
       'input.background': colors.primary_surface_2,
       'input.placeholderForeground': colors.neutral_40,
-      'inputValidation.errorBackground': colors.error_surface_2,
+      'inputValidation.errorBackground': colors.red_surface_2,
       'inputValidation.errorForeground': colors.red_20,
       'inputValidation.errorBorder': transparent,
 
@@ -104,6 +52,7 @@ export const createTheme = colors => {
 
       'list.hoverBackground': colors.primary_surface_3,
       'list.activeSelectionBackground': colors.primary_surface_3,
+      'list.activeSelectionForeground': colors.neutral_20,
       'list.inactiveSelectionBackground': colors.primary_surface_2,
       'list.dropBackground': colors.primary_40 + 80,
       'list.highlightForeground': colors.primary_40,
@@ -284,12 +233,13 @@ export const createTheme = colors => {
       'terminal.ansiBrightGreen': colors.green_40,
       'terminal.ansiBrightRed': colors.red_50,
       'terminal.ansiBrightYellow': colors.yellow_40,
-      'terminal.ansiBrightCyan': colors.skyblue_40,
+      'terminal.ansiBrightCyan': colors.sky_blue_40,
+
       'terminal.ansiBrightMagenta': colors.pink_50,
 
       'breadcrumb.foreground': colors.neutral_40,
       'breadcrumb.focusforeground': colors.neutral_20,
-      'breadcrumb.activeSelectionforeground': colors.neutral_20,
+      'breadcrumb.activeSelectionForeground': colors.neutral_20,
       'breadcrumbPicker.background': colors.primary_surface_2,
 
       'editorStickyScroll.background': colors.primary_surface + 80,
@@ -354,7 +304,7 @@ export const createTheme = colors => {
       {
         scope: ['variable.other', 'punctuation.definition'],
         settings: {
-          foreground: colors.skyblue_40
+          foreground: colors.sky_blue_40
         }
       },
       {
@@ -382,6 +332,9 @@ export const createTheme = colors => {
           foreground: colors.yellow_40
         }
       }
-    ]
+    ],
+    semanticTokenColors: {}
   }
 }
+
+export type Theme = ReturnType<typeof createTheme>
