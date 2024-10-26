@@ -1,9 +1,9 @@
 import vscode from 'vscode'
-import { normalizeInjectPath, readFile, writeFile } from './utils/file'
-import { errorNotification } from './utils/extension'
-import { buildDir, extensionUri, packageJson, settings } from './utils/config'
+import { createMaterialColors, createTheme, type Theme } from './theme/theme'
 import { AppData } from './utils/appdata'
-import { createTheme, type Theme, createMaterialColors } from './theme/theme'
+import { buildDir, extensionUri, packageJson, settings } from './utils/config'
+import { errorNotification } from './utils/extension'
+import { normalizeLocalInjectPath, readFile, writeFile } from './utils/file'
 import { getInstalledThemes, readTheme } from './utils/theme'
 
 // todo: Improve markdown highlighting.
@@ -61,7 +61,7 @@ const onCommandRemoveStyles = async () => {
   saveWorkbench(clearInjection(html))
 }
 
-const normalizeInlineHtml = (code: string) => {
+const toInlineCode = (code: string) => {
   if (/^<[^>]+>/.test(code)) return code
   const isCss = /\{[^}]+:[^}]+\}/.test(code)
   return `<${isCss ? 'style' : 'script'}>${code}</${isCss ? 'style' : 'script'}>`
@@ -71,27 +71,33 @@ const onCommandApplyStyles = async () => {
   const inject = settings().get<string[]>('inject', [])
   let code = ''
 
-  for (const content of inject) {
-    const isFile = content.endsWith('.css') || content.endsWith('.js')
-    if (!isFile) {
-      code += normalizeInlineHtml(content)
-      continue
-    }
-
-    const uri = normalizeInjectPath(content)
-    try {
-      await vscode.workspace.fs.stat(uri)
-      const corsBlocked = !uri.fsPath.startsWith(extensionUri.fsPath)
-      if (corsBlocked) code += normalizeInlineHtml(await readFile(uri))
-      else {
-        const withSchema = uri.with({ scheme: 'vscode-file', authority: 'vscode-app' })
-        code += content.endsWith('.css')
-          ? `\n<link rel="stylesheet" href="${withSchema.toString()}">\n`
-          : `\n<script src="${withSchema.toString()}"></script>\n`
+  for (const line of inject) {
+    const isFile = line.endsWith('.css') || line.endsWith('.js')
+    if (isFile) {
+      try {
+        if (line.startsWith('https://')) {
+          vscode.window.showInformationMessage('Fetching ' + line)
+          const response = await fetch(line)
+          if (response.ok) {
+            code += toInlineCode(await response.text())
+          } else throw new Error(response.statusText)
+        } else {
+          const uri = normalizeLocalInjectPath(line)
+          await vscode.workspace.fs.stat(uri)
+          if (uri.fsPath.startsWith(extensionUri.fsPath)) {
+            const withSchema = uri.with({ scheme: 'vscode-file', authority: 'vscode-app' })
+            code += line.endsWith('.css')
+              ? `\n<link rel="stylesheet" href="${withSchema.toString()}">\n`
+              : `\n<script src="${withSchema.toString()}"></script>\n`
+          } else {
+            // External `src`, `href` is blocked by CORS.
+            code += toInlineCode(await readFile(uri))
+          }
+        }
+      } catch (error: any) {
+        errorNotification(`${line}: ${error.message}`)
       }
-    } catch (error: any) {
-      errorNotification(`Skipping injection ${uri}: ${error.message}`)
-    }
+    } else code += toInlineCode(line)
   }
 
   let html = await readFile(workbenchFile)

@@ -7,8 +7,8 @@
 - Material You (Dark & Light).
 - Rounded corners.
 - Click ripple effect.
-- Inject inline CSS, JavaScript, HTML.
-- Separate syntax theme.
+- Modular syntax theme.
+- Inject custom code (CSS, JavaScript, HTML) via inline text, local file path, or URL.
 - Follow system theme e.g. [Mutagen](https://github.com/InioX/matugen), [Pywal](https://github.com/dylanaraps/pywal).
 
 Let me know your suggestions, issues on [Github](https://github.com/rakibdev/material-code/issues)

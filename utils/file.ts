@@ -17,7 +17,7 @@ export const readFile = async (uri: vscode.Uri) => {
   return stringFromArray(await vscode.workspace.fs.readFile(uri))
 }
 
-export const normalizeInjectPath = (path: string) => {
+export const normalizeLocalInjectPath = (path: string) => {
   path = path.replaceAll('${extensionDir}', extensionUri.fsPath)
 
   let uri: vscode.Uri = vscode.Uri.file(path)

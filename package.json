@@ -4,7 +4,7 @@
   "description": "Dynamic theme for Visual Studio Code.",
   "version": "3.0.0",
   "publisher": "rakib13332",
-  "author": "Rakib",
+  "author": "https://github.com/rakibdev",
   "icon": "icon.png",
   "galleryBanner.color": "#ffffff",
   "repository": {
@@ -54,22 +54,14 @@
         },
         "material-code.inject": {
           "type": "array",
+          "items": {
+            "type": "string"
+          },
           "default": [
             "${extensionDir}/build/inject.css",
             "${extensionDir}/build/inject.js"
           ],
-          "examples": [
-            "~/Downloads/custom.css",
-            "C:/Users/rakib/Downloads/custom.css",
-            "body { ... }",
-            "<style>...</style>",
-            "<script>...</script>",
-            "<div>...</div><style>...</style>"
-          ],
-          "items": {
-            "type": "string"
-          },
-          "markdownDescription": "Select **Command Palette > Material Code: Apply styles** after editing."
+          "markdownDescription": "Select **Command Palette > Material Code: Apply styles** after editing.\n\nExamples: \n* `~/Downloads/custom.css`\n* `C:/Users/rakib/Downloads/custom.css`\n* `https://raw.githubusercontent.com/.../custom.css`\n* `body { ... }`\n* `<style>...</style>`\n* `<script>...</script>`\n* `<div>...</div><style>...</style>`"
         },
         "material-code.syntaxTheme": {
           "type": "string",
