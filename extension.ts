@@ -1,9 +1,11 @@
+import * as materialColors from 'material-colors'
 import vscode from 'vscode'
-import { createMaterialColors, createTheme, type Theme } from './theme/theme'
+import { createVsCodeTheme, themeDefaults, type Theme } from './theme/theme'
 import { AppData } from './utils/appdata'
 import { buildDir, extensionUri, packageJson, settings } from './utils/config'
 import { errorNotification } from './utils/extension'
 import { normalizeLocalInjectPath, readFile, writeFile } from './utils/file'
+import { deepMerge } from './utils/object'
 import { getInstalledThemes, readTheme } from './utils/theme'
 
 // todo: Improve markdown highlighting.
@@ -117,8 +119,8 @@ const mergeSyntaxTheme = async (theme: Theme, syntaxThemeUri: vscode.Uri) => {
 }
 
 const saveTheme = async (themeUri: vscode.Uri, darkMode: boolean) => {
-  const colors = createMaterialColors({ darkMode, colors: { primary: settings().get('primaryColor') } })
-  const theme = createTheme(colors)
+  const options = deepMerge(themeDefaults, { darkMode, colors: { primary: settings().get<string>('primaryColor') } })
+  const theme = createVsCodeTheme(materialColors.flatten(materialColors.generate(options)))
 
   const syntaxThemeName = settings().get<string>('syntaxTheme')
   if (syntaxThemeName) {

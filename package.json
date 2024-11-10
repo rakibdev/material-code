@@ -22,6 +22,9 @@
     "theme"
   ],
   "main": "./build/extension.js",
+  "exports": {
+    "theme": "./theme/theme.ts"
+  },
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -83,28 +86,19 @@
       }
     ]
   },
-  "exports": {
-    "theme": {
-      "import": "./build/theme/theme.js",
-      "types": "./build/theme/theme.d.ts"
-    }
-  },
   "scripts": {
     "dev": "export DEV=true && bun ./scripts/dev.ts",
     "build": "bun ./scripts/dev.ts && yes | vsce package --no-dependencies",
     "release": "bun ./scripts/release.ts && xdg-open https://marketplace.visualstudio.com/manage"
   },
   "dependencies": {
-    "@material/material-color-utilities": "0.3.0",
-    "@vscode/sudo-prompt": "^9.3.1"
+    "@vscode/sudo-prompt": "^9.3.1",
+    "material-colors": "github:rakibdev/material-colors"
   },
   "devDependencies": {
-    "@types/bun": "^1.1.11",
+    "@types/bun": "^1.1.13",
     "@types/vscode": "1.75.0",
-    "@vscode/vsce": "^3.1.1",
+    "@vscode/vsce": "^3.2.1",
     "esbuild": "^0.24.0"
-  },
-  "patchedDependencies": {
-    "@material/material-color-utilities@0.3.0": "patches/@material%2Fmaterial-color-utilities@0.3.0.patch"
   }
 }

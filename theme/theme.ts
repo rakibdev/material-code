@@ -1,9 +1,25 @@
-import type { themeDefaults } from './config'
-import type { MaterialColors } from './colors'
+import * as materialColors from 'material-colors'
 
-export { createMaterialColors } from './colors'
+export const themeDefaults = {
+  darkMode: true,
+  colors: {
+    primary: '#00adff',
+    // Syntax colors.
+    blue: '#0091ff',
+    sky_blue: '#00adff',
+    red: '#ff002b',
+    green: '#00ffac',
+    pink: '#ff00d9',
+    yellow: '#ffee00'
+  },
+  tones: [80, 50, 40, 20] as const
+}
 
-export const createTheme = (colors: MaterialColors<(typeof themeDefaults)['colors']>) => {
+type ThemeDefaults = typeof themeDefaults
+
+export const createVsCodeTheme = (
+  colors: materialColors.FlatMaterialColors<ThemeDefaults['colors'], ThemeDefaults['tones']>
+) => {
   const transparent = '#ffffff00'
   return {
     name: 'Material Code',
@@ -337,4 +353,4 @@ export const createTheme = (colors: MaterialColors<(typeof themeDefaults)['color
   }
 }
 
-export type Theme = ReturnType<typeof createTheme>
+export type Theme = ReturnType<typeof createVsCodeTheme>

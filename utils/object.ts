@@ -1,16 +1,16 @@
-export type DeepPartial<T> = T extends object
-  ? {
-      [P in keyof T]?: DeepPartial<T[P]>
-    }
-  : T
+export type DeepPartial<T> = {
+  [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K]
+}
 
-export const deepMerge = <Target extends Record<string, any>>(target: Target, source: DeepPartial<Target>) => {
+export const deepMerge = <T>(target: T, source: DeepPartial<T>) => {
   const result = { ...target }
-  for (const [key, value] of Object.entries(source)) {
-    if (value == null || value == undefined) continue
-    if (typeof value == 'object' && typeof target[key] == 'object' && !Array.isArray(value))
-      (result[key] as object) = deepMerge(target[key], value)
-    else (result[key] as any) = value
+  for (const key in source) {
+    if (source[key] == null || source[key] == undefined) continue
+    if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+      result[key] = deepMerge(target[key], source[key])
+    } else {
+      result[key] = source[key] as T[typeof key]
+    }
   }
   return result
 }
