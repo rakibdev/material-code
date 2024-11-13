@@ -19,8 +19,8 @@ Bun.write(
     author,
     files: ['**/*.js', '**/*.d.ts'],
     exports: {
-      // Use `.theme` not `theme`. Otherwise VS Code don't resolve import types.
-      '.theme': {
+      // Use `./theme` not `theme`. Otherwise VS Code don't resolve import types.
+      './theme': {
         import: './theme.js',
         types: './theme.d.ts'
       }
