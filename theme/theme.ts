@@ -1,4 +1,4 @@
-import * as materialColors from 'material-colors'
+import { type FlatMaterialColors } from 'material-colors'
 
 export const themeOptions = {
   darkMode: true,
@@ -17,9 +17,7 @@ export const themeOptions = {
 
 type ThemeOptions = typeof themeOptions
 
-export const createVsCodeTheme = (
-  colors: materialColors.FlatMaterialColors<ThemeOptions['colors'], ThemeOptions['tones']>
-) => {
+export const createVsCodeTheme = (colors: FlatMaterialColors<ThemeOptions['colors'], ThemeOptions['tones']>) => {
   const transparent = '#ffffff00'
   return {
     name: 'Material Code',

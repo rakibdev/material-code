@@ -1,4 +1,3 @@
-import { generate } from '@stacksjs/dtsx'
 import { $, type BuildConfig } from 'bun'
 import packageJson from '../../package.json'
 
@@ -18,8 +17,10 @@ Bun.write(
     description,
     version,
     author,
+    files: ['**/*.js', '**/*.d.ts'],
     exports: {
-      theme: {
+      // Use `.theme` not `theme`. Otherwise VS Code don't resolve import types.
+      '.theme': {
         import: './theme.js',
         types: './theme.d.ts'
       }
@@ -27,13 +28,7 @@ Bun.write(
   })
 )
 
-await generate({
-  root: './',
-  entrypoints: ['./theme/theme.ts'],
-  outdir: options.outdir,
-  tsconfigPath: './scripts/npm/tsconfig.json',
-  clean: false
-})
+await $`tsc --project ./scripts/npm/tsconfig.json`
 
 process.chdir(options.outdir!)
 await $`bun pm pack`
