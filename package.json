@@ -91,7 +91,7 @@
   },
   "dependencies": {
     "@vscode/sudo-prompt": "^9.3.1",
-    "material-colors": "https://github.com/rakibdev/material-colors/releases/download/1.0.0/material-colors.tgz"
+    "material-colors": "https://github.com/rakibdev/material-colors/releases/download/1.0.0/npm.tgz"
   },
   "devDependencies": {
     "@types/bun": "^1.1.13",

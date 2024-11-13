@@ -24,6 +24,9 @@ Bun.write(
         import: './theme.js',
         types: './theme.d.ts'
       }
+    },
+    peerDependencies: {
+      'material-colors': packageJson.dependencies['material-colors']
     }
   })
 )
