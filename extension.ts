@@ -1,6 +1,6 @@
 import * as materialColors from 'material-colors'
 import vscode from 'vscode'
-import { createVsCodeTheme, themeDefaults, type Theme } from './theme/theme'
+import { createVsCodeTheme, themeOptions, type Theme } from './theme/theme'
 import { AppData } from './utils/appdata'
 import { buildDir, extensionUri, packageJson, settings } from './utils/config'
 import { errorNotification } from './utils/extension'
@@ -119,7 +119,7 @@ const mergeSyntaxTheme = async (theme: Theme, syntaxThemeUri: vscode.Uri) => {
 }
 
 const saveTheme = async (themeUri: vscode.Uri, darkMode: boolean) => {
-  const options = deepMerge(themeDefaults, { darkMode, colors: { primary: settings().get<string>('primaryColor') } })
+  const options = deepMerge(themeOptions, { darkMode, colors: { primary: settings().get<string>('primaryColor') } })
   const theme = createVsCodeTheme(materialColors.flatten(materialColors.generate(options)))
 
   const syntaxThemeName = settings().get<string>('syntaxTheme')

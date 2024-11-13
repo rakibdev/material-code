@@ -1,6 +1,6 @@
 import * as materialColors from 'material-colors'
 
-export const themeDefaults = {
+export const themeOptions = {
   darkMode: true,
   colors: {
     primary: '#00adff',
@@ -15,10 +15,10 @@ export const themeDefaults = {
   tones: [80, 50, 40, 20] as const
 }
 
-type ThemeDefaults = typeof themeDefaults
+type ThemeOptions = typeof themeOptions
 
 export const createVsCodeTheme = (
-  colors: materialColors.FlatMaterialColors<ThemeDefaults['colors'], ThemeDefaults['tones']>
+  colors: materialColors.FlatMaterialColors<ThemeOptions['colors'], ThemeOptions['tones']>
 ) => {
   const transparent = '#ffffff00'
   return {

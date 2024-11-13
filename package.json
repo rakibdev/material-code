@@ -22,9 +22,6 @@
     "theme"
   ],
   "main": "./build/extension.js",
-  "exports": {
-    "theme": "./theme/theme.ts"
-  },
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -89,13 +86,15 @@
   "scripts": {
     "dev": "export DEV=true && bun ./scripts/dev.ts",
     "build": "bun ./scripts/dev.ts && yes | vsce package --no-dependencies",
+    "build:npm": "bun ./scripts/npm/build.ts",
     "release": "bun ./scripts/release.ts && xdg-open https://marketplace.visualstudio.com/manage"
   },
   "dependencies": {
     "@vscode/sudo-prompt": "^9.3.1",
-    "material-colors": "github:rakibdev/material-colors"
+    "material-colors": "https://github.com/rakibdev/material-colors/releases/download/1.0.0/material-colors.tgz"
   },
   "devDependencies": {
+    "@stacksjs/dtsx": "^0.7.0",
     "@types/bun": "^1.1.13",
     "@types/vscode": "1.75.0",
     "@vscode/vsce": "^3.2.1",

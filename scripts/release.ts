@@ -1,5 +1,6 @@
 import { $ } from 'bun'
-import { colors } from './utils'
+import { colors } from './config'
+import { createRelease } from './github'
 
 const tags = (await $`git tag -l --sort=-v:refname`.text()).split('\n').flatMap(tag => (tag ? tag.trim() : []))
 const lastTag = tags[0]
@@ -47,24 +48,4 @@ releaseNotes.push(
 )
 releaseNotes = releaseNotes.join('\n\n')
 
-await $`git tag ${version}`
-await $`git push origin ${version}`
-
-const origin = (await $`git remote get-url origin'`.text()).trim().split('/')
-const repo = origin.pop()!.replace('.git', '')
-const owner = origin.pop()
-const authToken = (await $`git config --get user.password`.text()).trim()
-const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/releases`, {
-  method: 'POST',
-  headers: {
-    Authorization: `token ${authToken}`,
-    Accept: 'application/vnd.github.v3+json'
-  },
-  body: JSON.stringify({
-    name: version,
-    tag_name: version,
-    body: releaseNotes
-  })
-})
-if (response.ok) console.log(colors.green + `Released v${version}.` + `\n\n${releaseNotes}` + colors.reset)
-else console.log(colors.red + `Failed to create release v${version}.` + colors.reset)
+await createRelease(version, releaseNotes)

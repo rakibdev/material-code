@@ -1,6 +1,6 @@
 import { build, context, type BuildOptions, type Plugin } from 'esbuild'
 import * as materialColors from 'material-colors'
-import { colors } from './utils'
+import { colors } from './config'
 
 const options: BuildOptions = {
   outdir: 'build',
@@ -18,12 +18,12 @@ const themeGenerator: Plugin = {
   name: 'themeGenerator',
   setup(build) {
     const generate = async () => {
-      const { createVsCodeTheme, themeDefaults } = (await importUncached(
+      const { createVsCodeTheme, themeOptions } = (await importUncached(
         `../theme/theme`
       )) as typeof import('../theme/theme')
-      const darkTheme = createVsCodeTheme(materialColors.flatten(materialColors.generate(themeDefaults)))
+      const darkTheme = createVsCodeTheme(materialColors.flatten(materialColors.generate(themeOptions)))
       const lightTheme = createVsCodeTheme(
-        materialColors.flatten(materialColors.generate({ ...themeDefaults, darkMode: false }))
+        materialColors.flatten(materialColors.generate({ ...themeOptions, darkMode: false }))
       )
       await Bun.write(`${options.outdir}/dark.json`, JSON.stringify(darkTheme))
       await Bun.write(`${options.outdir}/light.json`, JSON.stringify(lightTheme))
