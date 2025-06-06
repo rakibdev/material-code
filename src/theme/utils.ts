@@ -25,8 +25,17 @@ export const readTheme = async (uri: vscode.Uri, parent = {}) => {
   let content: Record<string, any> = {}
 
   try {
-    content = JSON.parse(await readFile(uri))
-  } catch {
+    let jsonString = await readFile(uri)
+
+    jsonString = jsonString
+      // Remove comments, not URLs in strings (e.g. "$schema": "vscode://schemas/color-theme")
+      .replace(/\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g, (m, g) => (g ? '' : m))
+      // Remove trailing commas
+      .replace(/,(\s*[}\]])/g, '$1')
+
+    content = JSON.parse(jsonString)
+  } catch (error: any) {
+    errorNotification(error.message)
     return parent
   }
   if (content.include) {
