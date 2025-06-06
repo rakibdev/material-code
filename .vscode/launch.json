@@ -4,7 +4,7 @@
       "name": "Dev: Extension",
       "request": "launch",
       "type": "extensionHost",
-      "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}", "--disable-extensions"],
       "outFiles": ["${workspaceFolder}/build/**/*.js"]
     }
   ]

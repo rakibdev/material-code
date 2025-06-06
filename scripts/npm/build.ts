@@ -5,7 +5,7 @@ const options: BuildConfig = {
   outdir: 'build/npm',
   minify: true,
   format: 'esm',
-  entrypoints: ['./theme/theme.ts']
+  entrypoints: ['./src/theme/create.ts']
 }
 await Bun.build(options)
 

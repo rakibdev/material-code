@@ -5,5 +5,5 @@
     "declarationDir": "../../build/npm",
     "declaration": true
   },
-  "include": ["../../theme/theme.ts"]
+  "include": ["../../src/theme/create.ts"]
 }

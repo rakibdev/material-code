@@ -65,10 +65,7 @@
         },
         "material-code.syntaxTheme": {
           "type": "string",
-          "examples": [
-            "Dark Modern"
-          ],
-          "markdownDescription": "Select **Command Palette > Preferences: Color Theme** to view available themes."
+          "markdownDescription": "Use **Command Palette > Material Code: Select Syntax Theme**"
         }
       }
     },
@@ -80,6 +77,10 @@
       {
         "command": "material-code.removeStyles",
         "title": "Material Code: Remove styles"
+      },
+      {
+        "command": "material-code.selectSyntaxTheme",
+        "title": "Material Code: Select Syntax Theme"
       }
     ]
   },
@@ -94,10 +95,10 @@
     "material-colors": "https://github.com/rakibdev/material-colors/releases/download/1.0.0/npm.tgz"
   },
   "devDependencies": {
-    "@types/bun": "^1.1.13",
+    "@types/bun": "^1.2.15",
     "@types/vscode": "1.75.0",
-    "@vscode/vsce": "^3.2.1",
-    "esbuild": "^0.24.0",
-    "typescript": "^5.6.3"
+    "@vscode/vsce": "^3.5.0",
+    "esbuild": "^0.24.2",
+    "typescript": "^5.8.3"
   }
 }

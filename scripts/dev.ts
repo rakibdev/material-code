@@ -18,20 +18,22 @@ const themeGenerator: Plugin = {
   name: 'themeGenerator',
   setup(build) {
     const generate = async () => {
-      const { createVsCodeTheme, themeOptions } = (await importUncached(
-        `../theme/theme`
-      )) as typeof import('../theme/theme')
-      const darkTheme = createVsCodeTheme(materialColors.flatten(materialColors.generate(themeOptions)))
-      const lightTheme = createVsCodeTheme(
-        materialColors.flatten(materialColors.generate({ ...themeOptions, darkMode: false }))
-      )
+      const { createEditorTheme, createSemanticColors, themeOptions } = (await importUncached(
+        `../src/theme/create`
+      )) as typeof import('../src/theme/create')
+      const darkColors = materialColors.flatten(materialColors.generate(themeOptions))
+      const lightColors = materialColors.flatten(materialColors.generate({ ...themeOptions, darkMode: false }))
+
+      const darkTheme = createEditorTheme(createSemanticColors(darkColors))
+      const lightTheme = createEditorTheme(createSemanticColors(lightColors))
+
       await Bun.write(`${options.outdir}/dark.json`, JSON.stringify(darkTheme))
       await Bun.write(`${options.outdir}/light.json`, JSON.stringify(lightTheme))
       console.log(colors.green + 'Themes generated.' + colors.reset)
     }
     let lastModified: number
     build.onEnd(async () => {
-      const file = Bun.file('./theme/theme.ts')
+      const file = Bun.file('./src/theme/create.ts')
       if (lastModified == file.lastModified) return
       lastModified = file.lastModified
       generate()
@@ -41,7 +43,7 @@ const themeGenerator: Plugin = {
 
 const extension: BuildOptions = {
   ...options,
-  entryPoints: ['extension.ts'],
+  entryPoints: ['./src/extension.ts'],
   format: 'cjs',
   platform: 'node',
   plugins: [themeGenerator],
