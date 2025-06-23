@@ -1,13 +1,12 @@
 import { dirname } from 'path'
 import * as vscode from 'vscode'
-import { createEditorTheme, themeOptions, type Theme } from './create'
+import { createVsCodeTheme, themeOptions, type VsCodeTheme } from './create'
 import { settings } from '../utils/config'
 import { errorNotification } from '../utils/extension'
 import { readFile, writeFile } from '../utils/file'
 import { deepMerge } from '../utils/object'
 import { mergeSyntaxTheme } from './syntax'
-import * as materialColors from 'material-colors'
-import { createSemanticColors } from './create'
+import { createTheme } from './create'
 
 export const getInstalledThemes = () => {
   const result: Record<string, vscode.Uri> = {}
@@ -28,7 +27,7 @@ export const readTheme = async (uri: vscode.Uri, parent = {}) => {
     let jsonString = await readFile(uri)
 
     jsonString = jsonString
-      // Remove comments, not URLs in strings (e.g. "$schema": "vscode://schemas/color-theme")
+      // Remove comments, except URLs in strings (e.g. "$schema": "vscode://schemas/color-theme")
       .replace(/\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g, (m, g) => (g ? '' : m))
       // Remove trailing commas
       .replace(/,(\s*[}\]])/g, '$1')
@@ -45,19 +44,22 @@ export const readTheme = async (uri: vscode.Uri, parent = {}) => {
 
   content = deepMerge(content, parent)
 
-  return content as Theme
+  return content as VsCodeTheme
 }
 
 export const saveTheme = async (uri: vscode.Uri, darkMode: boolean) => {
-  const options = deepMerge(themeOptions, { darkMode, colors: { primary: settings().get<string>('primaryColor') } })
-  const flatColors = materialColors.flatten(materialColors.generate(options))
-  const theme = createEditorTheme(createSemanticColors(flatColors))
+  const options = deepMerge(themeOptions, {
+    darkMode,
+    primary: settings().get<string>('primaryColor') || themeOptions.primary
+  })
+
+  const theme = createVsCodeTheme(createTheme(options))
 
   const syntaxThemeName = settings().get<string>('syntaxTheme')
   if (syntaxThemeName) {
     const themes = getInstalledThemes()
     const syntaxThemeUri = themes[syntaxThemeName]
-    if (syntaxThemeUri) await mergeSyntaxTheme(theme, (await readTheme(syntaxThemeUri)) as Theme)
+    if (syntaxThemeUri) await mergeSyntaxTheme(theme, (await readTheme(syntaxThemeUri)) as VsCodeTheme)
     else return errorNotification(`Syntax theme "${syntaxThemeName}" not found.`)
   }
 
