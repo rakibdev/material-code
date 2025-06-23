@@ -25,7 +25,42 @@ And to revert run **Material Code: Remove styles**.
 
 ### Follow system theme
 
-Material Code's installation directory (e.g. `~/.vscode-insiders/extensions/rakib13332.material-code.../build/theme.js`). The **theme.js** file exports functions to control theme programmatically outside VS Code. So call these whenever your system theme changes. I use shell scripts to apply system-wide GTK and VS Code theme at once, see [vscode.js](https://github.com/rakibdev/dotfiles/blob/main/home/rakib/Downloads/apps-script/theme/vscode.js). Edit according to your system before using.
+Use node package for programmatic theme control outside VS Code.
+
+```bash
+bun add https://github.com/rakibdev/material-code/releases/latest/download/npm.tgz
+```
+
+You can automatically update VS Code theme whenever your system theme changes using script:
+
+```typescript
+import { createTheme, createVsCodeTheme, themeOptions } from 'material-code/theme'
+import { readdir } from 'node:fs/promises'
+
+// I'm using custom color generator, not Pywal.
+const systemFile = Bun.env.HOME + '/.config/system-ui/app-data.json'
+const systemTheme = await Bun.file(systemFile).json()
+
+// Find installed extension folder
+const vscodeDir = Bun.env.HOME + '/.vscode-insiders/extensions/'
+const targetExtension = (await readdir(vscodeDir)).find(dir => dir.includes('material-code'))
+const extensionDir = vscodeDir + targetExtension + '/build'
+
+const theme = createTheme({
+  // Defaults
+  ...themeOptions,
+
+  // Overrides
+  darkMode: systemTheme.darkMode,
+  primary: systemTheme.primary
+  // ...more. TypeScript provides autocomplete
+})
+
+const vscodeTheme = createVsCodeTheme(theme)
+
+// Saving as dark variant
+await Bun.write(`${extensionDir}/dark.json`, JSON.stringify(vscodeTheme))
+```
 
 ## Help
 
