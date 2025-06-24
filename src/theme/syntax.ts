@@ -1,7 +1,7 @@
 import vscode from 'vscode'
 import { packageJson, settings } from '../utils/config'
 import { getInstalledThemes, readTheme } from './utils'
-import { type Theme } from './create'
+import { type VsCodeTheme } from './create'
 
 export const openSyntaxThemePicker = async () => {
   const themes = getInstalledThemes()
@@ -35,10 +35,10 @@ export const openSyntaxThemePicker = async () => {
   quickPick.show()
 }
 
-export const mergeSyntaxTheme = async (target: Theme, source: Theme) => {
+export const mergeSyntaxTheme = async (target: VsCodeTheme, source: VsCodeTheme) => {
   target.tokenColors = source.tokenColors
   target.semanticTokenColors = source.semanticTokenColors
-  for (const key of Object.keys(target.colors) as Array<keyof Theme['colors']>) {
+  for (const key of Object.keys(target.colors) as Array<keyof VsCodeTheme['colors']>) {
     if (key.startsWith('editorBracket')) target.colors[key] = source.colors?.[key]
   }
 }

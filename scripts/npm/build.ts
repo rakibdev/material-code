@@ -21,8 +21,8 @@ Bun.write(
     exports: {
       // Use `./theme` not `theme`. Otherwise VS Code don't resolve import types.
       './theme': {
-        import: './theme.js',
-        types: './theme.d.ts'
+        import: './create.js',
+        types: './create.d.ts'
       }
     },
     peerDependencies: {

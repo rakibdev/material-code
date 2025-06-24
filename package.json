@@ -2,7 +2,7 @@
   "name": "material-code",
   "displayName": "Material Code",
   "description": "Dynamic theme for Visual Studio Code.",
-  "version": "3.0.2",
+  "version": "3.0.5",
   "publisher": "rakib13332",
   "author": "https://github.com/rakibdev",
   "icon": "icon.png",
@@ -48,8 +48,8 @@
       "properties": {
         "material-code.primaryColor": {
           "type": "string",
-          "default": "#00adff",
-          "pattern": "^#([A-Fa-f0-9]{6})$",
+          "default": "",
+          "pattern": "^(#([A-Fa-f0-9]{6})|)$",
           "patternErrorMessage": "Invalid color."
         },
         "material-code.inject": {
@@ -92,7 +92,7 @@
   },
   "dependencies": {
     "@vscode/sudo-prompt": "^9.3.1",
-    "material-colors": "https://github.com/rakibdev/material-colors/releases/download/1.0.0/npm.tgz"
+    "material-colors": "link:material-colors"
   },
   "devDependencies": {
     "@types/bun": "^1.2.15",
