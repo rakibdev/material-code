@@ -6,20 +6,26 @@ import { normalizeInjectPath, readFile, writeFile } from './utils/file'
 let appDataDir: vscode.Uri
 let workbenchFile: vscode.Uri
 
-export const init = (dir: vscode.Uri) => {
+export const init = async (dir: vscode.Uri) => {
   appDataDir = dir
 
   const vscodeRoot = vscode.Uri.file(vscode.env.appRoot)
-  ;[
-    'out/vs/code/electron-sandbox/workbench/workbench.esm.html', // Above 1.94.0
+  const files = [
+    'out/vs/code/electron-browser/workbench/workbench.html', // Above v1.105.0
+    'out/vs/code/electron-sandbox/workbench/workbench.esm.html', // Above v1.94.0
     'out/vs/code/electron-sandbox/workbench/workbench.html'
-  ].forEach(async file => {
+  ]
+
+  for (const file of files) {
     try {
       const uri = vscode.Uri.joinPath(vscodeRoot, file)
       await vscode.workspace.fs.stat(uri)
       workbenchFile = uri
+      return
     } catch {}
-  })
+  }
+
+  errorNotification('workbench.html not found')
 }
 
 export const updateWorkbenchFile = async (workbenchHtml: string) => {
