@@ -81,7 +81,7 @@ In rare cases like [this](https://github.com/rakibdev/material-code/issues/2) wh
 .mac,
 .windows,
 .linux {
-  font-family: Google Sans;
+  font-family: Google Sans !important;
 }
 ```
 
