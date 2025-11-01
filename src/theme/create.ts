@@ -483,7 +483,8 @@ export const createVsCodeTheme = (colors: Theme) => {
         }
       }
     ],
-    semanticTokenColors: {}
+    semanticTokenColors: {},
+    semanticHighlighting: true
   }
 }
 

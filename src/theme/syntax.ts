@@ -38,6 +38,7 @@ export const openSyntaxThemePicker = async () => {
 export const mergeSyntaxTheme = async (target: VsCodeTheme, source: VsCodeTheme) => {
   target.tokenColors = source.tokenColors
   target.semanticTokenColors = source.semanticTokenColors
+  target.semanticHighlighting = source.semanticHighlighting
   for (const key of Object.keys(target.colors) as Array<keyof VsCodeTheme['colors']>) {
     if (key.startsWith('editorBracket')) target.colors[key] = source.colors?.[key]
   }

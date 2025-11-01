@@ -20,6 +20,25 @@ export const getInstalledThemes = () => {
   return result
 }
 
+export const mergeTheme = (target: any, source: any) => {
+  const sourceCopy = { ...source }
+
+  // If both target and source have tokenColors, merge them
+  if (Array.isArray(target?.tokenColors) && Array.isArray(source?.tokenColors)) {
+    sourceCopy.tokenColors = [...target.tokenColors, ...source.tokenColors]
+  }
+
+  if (target?.colors && source?.colors) {
+    sourceCopy.colors = { ...target.colors, ...source.colors }
+  }
+
+  if (target?.semanticTokenColors && source?.semanticTokenColors) {
+    sourceCopy.semanticTokenColors = { ...target.semanticTokenColors, ...source.semanticTokenColors }
+  }
+
+  return { ...target, ...sourceCopy }
+}
+
 export const readTheme = async (uri: vscode.Uri, parent = {}) => {
   let content: Record<string, any> = {}
 
@@ -37,30 +56,36 @@ export const readTheme = async (uri: vscode.Uri, parent = {}) => {
     errorNotification(error.message)
     return parent
   }
+
   if (content.include) {
     const includeUri = vscode.Uri.joinPath(vscode.Uri.file(dirname(uri.path)), content.include)
-    content = await readTheme(includeUri, content)
+    const includedContent = await readTheme(includeUri)
+    // Included first (lowest priority)
+    content = mergeTheme(includedContent, content)
   }
 
-  content = deepMerge(content, parent)
+  content = mergeTheme(content, parent)
 
   return content as VsCodeTheme
 }
 
 export const saveTheme = async (uri: vscode.Uri, darkMode: boolean) => {
-  const options = deepMerge(themeOptions, {
+  const options = {
+    ...themeOptions,
     darkMode,
     primary: settings().get<string>('primaryColor') || themeOptions.primary
-  })
+  }
 
   const theme = createVsCodeTheme(createTheme(options))
 
-  const syntaxThemeName = settings().get<string>('syntaxTheme')
-  if (syntaxThemeName) {
+  const name = settings().get<string>(darkMode ? 'syntaxTheme' : 'lightSyntaxTheme')
+  if (name) {
     const themes = getInstalledThemes()
-    const syntaxThemeUri = themes[syntaxThemeName]
-    if (syntaxThemeUri) await mergeSyntaxTheme(theme, (await readTheme(syntaxThemeUri)) as VsCodeTheme)
-    else return errorNotification(`Syntax theme "${syntaxThemeName}" not found.`)
+    const sourceUri = themes[name]?.uri
+    if (sourceUri) {
+      const source = (await readTheme(sourceUri)) as VsCodeTheme
+      await mergeSyntaxTheme(theme, source)
+    } else return errorNotification(`Syntax theme "${name}" not found.`)
   }
 
   await writeFile(uri, JSON.stringify(theme))
