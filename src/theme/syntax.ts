@@ -10,7 +10,9 @@ export const openSyntaxThemePicker = async () => {
   const icon = `$(symbol-color)`
   const quickPick = vscode.window.createQuickPick()
   quickPick.items = [
-    ...Object.keys(themes)
+    ...Object.entries(themes)
+      .filter(([, t]) => (settingKey == 'syntaxTheme' ? t.uiTheme != 'vs' : t.uiTheme == 'vs'))
+      .map(([name]) => name)
       .sort((item, item2) => {
         if (item == current) return -1
         if (item2 == current) return 1
