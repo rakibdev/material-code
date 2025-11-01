@@ -36,7 +36,8 @@ export const activate = async (context: vscode.ExtensionContext) => {
   vscode.workspace.onDidChangeConfiguration(event => {
     if (
       event.affectsConfiguration('material-code.primaryColor') ||
-      event.affectsConfiguration('material-code.syntaxTheme')
+      event.affectsConfiguration('material-code.syntaxTheme') ||
+      event.affectsConfiguration('material-code.lightSyntaxTheme')
     ) {
       updateThemes()
     }
@@ -45,7 +46,10 @@ export const activate = async (context: vscode.ExtensionContext) => {
   const commands = [
     vscode.commands.registerCommand('material-code.applyStyles', inject.applyStyles),
     vscode.commands.registerCommand('material-code.removeStyles', inject.removeStyles),
-    vscode.commands.registerCommand('material-code.selectSyntaxTheme', openSyntaxThemePicker)
+    vscode.commands.registerCommand('material-code.selectSyntaxTheme', () => openSyntaxThemePicker('syntaxTheme')),
+    vscode.commands.registerCommand('material-code.selectLightSyntaxTheme', () =>
+      openSyntaxThemePicker('lightSyntaxTheme')
+    )
   ]
   commands.forEach(command => context.subscriptions.push(command))
 }

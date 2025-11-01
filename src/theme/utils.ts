@@ -4,17 +4,19 @@ import { createVsCodeTheme, themeOptions, type VsCodeTheme } from './create'
 import { settings } from '../utils/config'
 import { errorNotification } from '../utils/extension'
 import { readFile, writeFile } from '../utils/file'
-import { deepMerge } from '../utils/object'
 import { mergeSyntaxTheme } from './syntax'
 import { createTheme } from './create'
 
 export const getInstalledThemes = () => {
-  const result: Record<string, vscode.Uri> = {}
+  const result: Record<string, { uri: vscode.Uri; uiTheme: string }> = {}
   vscode.extensions.all.forEach(extension => {
     const themes = extension.packageJSON.contributes?.themes
     if (!themes) return
     for (const theme of themes) {
-      result[theme.label] = vscode.Uri.joinPath(vscode.Uri.file(extension.extensionPath), theme.path)
+      result[theme.label] = {
+        uri: vscode.Uri.joinPath(vscode.Uri.file(extension.extensionPath), theme.path),
+        uiTheme: theme.uiTheme
+      }
     }
   })
   return result

@@ -1,11 +1,12 @@
 import vscode from 'vscode'
 import { packageJson, settings } from '../utils/config'
-import { getInstalledThemes, readTheme } from './utils'
+import { errorNotification } from '../utils/extension'
+import { getInstalledThemes } from './utils'
 import { type VsCodeTheme } from './create'
 
-export const openSyntaxThemePicker = async () => {
+export const openSyntaxThemePicker = async (settingKey: 'syntaxTheme' | 'lightSyntaxTheme') => {
   const themes = getInstalledThemes()
-  const current = settings().get<string>('syntaxTheme') || packageJson.displayName
+  const current = settings().get<string>(settingKey) || packageJson.displayName
 
   const icon = `$(symbol-color)`
   const quickPick = vscode.window.createQuickPick()
