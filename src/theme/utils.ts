@@ -80,7 +80,7 @@ export const saveTheme = async (uri: vscode.Uri, darkMode: boolean) => {
 
   const theme = createVsCodeTheme(createTheme(options))
 
-  const name = settings().get<string>(darkMode ? 'syntaxTheme' : 'lightSyntaxTheme')
+  const name = settings().get<string>(darkMode ? 'syntaxTheme' : 'syntaxThemeLight')
   if (name) {
     const themes = getInstalledThemes()
     const sourceUri = themes[name]?.uri

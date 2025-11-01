@@ -2,7 +2,7 @@
   "name": "material-code",
   "displayName": "Material Code",
   "description": "Dynamic theme for Visual Studio Code.",
-  "version": "3.0.8",
+  "version": "3.0.9",
   "publisher": "rakib13332",
   "author": "https://github.com/rakibdev",
   "icon": "icon.png",
@@ -67,7 +67,7 @@
           "type": "string",
           "markdownDescription": "**Command Palette > Material Code: Dark Syntax Theme**"
         },
-        "material-code.lightSyntaxTheme": {
+        "material-code.syntaxThemeLight": {
           "type": "string",
           "markdownDescription": "**Command Palette > Material Code: Light Syntax Theme**"
         }
@@ -83,7 +83,7 @@
         "title": "Material Code: Remove styles"
       },
       {
-        "command": "material-code.selectSyntaxTheme",
+        "command": "material-code.selectDarkSyntaxTheme",
         "title": "Material Code: Dark Syntax Theme"
       },
       {

@@ -4,7 +4,7 @@ import { errorNotification } from '../utils/extension'
 import { getInstalledThemes } from './utils'
 import { type VsCodeTheme } from './create'
 
-export const openSyntaxThemePicker = async (settingKey: 'syntaxTheme' | 'lightSyntaxTheme') => {
+export const openSyntaxThemePicker = async (settingKey: 'syntaxTheme' | 'syntaxThemeLight') => {
   const themes = getInstalledThemes()
   const current = settings().get<string>(settingKey) || packageJson.displayName
 
