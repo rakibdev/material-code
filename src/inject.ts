@@ -56,6 +56,8 @@ export const updateWorkbenchFile = async (workbenchHtml: string) => {
   }
 }
 
+export const CSP_REGEX = /<meta\s+http-equiv="Content-Security-Policy"[^>]*>/s
+
 export const clearInjection = (workbenchHtml: string) =>
   workbenchHtml.replace(/\n*?<!--material-code-->.*?<!--material-code-->\n*?/s, '\n\n')
 

@@ -1,4 +1,5 @@
 import { test, expect } from 'bun:test'
+import { CSP_REGEX } from '../src/inject'
 
 // Without UTF-8 meta tag, Windsurf side chat displays blank
 test('should preserve UTF-8 meta tag when removing CSP', () => {
@@ -12,7 +13,7 @@ test('should preserve UTF-8 meta tag when removing CSP', () => {
     </html>
   `
 
-  const result = html.replace(/<meta\s+http-equiv="Content-Security-Policy"[^>]*>/s, '')
+  const result = html.replace(CSP_REGEX, '')
 
   expect(result).toInclude('<meta charset="utf-8" />')
   expect(result).not.toInclude('Content-Security-Policy')

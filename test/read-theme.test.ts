@@ -1,7 +1,7 @@
 import { test, expect, beforeEach, afterEach } from 'bun:test'
 import { mkdir, writeFile, rm, readFile } from 'fs/promises'
 import { join } from 'path'
-import { mergeThemeContent } from '../src/theme/utils'
+import { mergeTheme } from '../src/theme/utils'
 
 const testDir = join(import.meta.dir, '.test-themes')
 
@@ -49,8 +49,8 @@ test('should merge multiple levels of nested includes', async () => {
   const level3 = JSON.parse(await readFile(join(testDir, 'level3.json'), 'utf-8'))
 
   // Simulate recursive merge: level1 < level2 < level3
-  const merged12 = mergeThemeContent(level1, level2)
-  const merged123 = mergeThemeContent(merged12, level3)
+  const merged12 = mergeTheme(level1, level2)
+  const merged123 = mergeTheme(merged12, level3)
 
   // Verify colors merged with proper priority
   expect(merged123.colors['editor.background']).toBe('#f0f0f0') // from level2
