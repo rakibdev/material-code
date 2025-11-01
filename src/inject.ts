@@ -100,7 +100,7 @@ export const applyStyles = async () => {
 
   let html = await readFile(workbenchFile)
   html = clearInjection(html)
-    .replace(/<meta.*http-equiv="Content-Security-Policy".*?>/s, '')
+    .replace(/<meta\s+http-equiv="Content-Security-Policy"[^>]*>/s, '')
     .replace(/\n*?<\/html>/, `\n\n<!--material-code-->${code}<!--material-code-->\n\n</html>`)
   updateWorkbenchFile(html)
 }
