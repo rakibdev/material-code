@@ -7,7 +7,7 @@
 - Material You (Dark & Light).
 - Rounded corners.
 - Click ripple effect.
-- Modular syntax theme.
+- Seperate syntax theming.
 - Inject custom code (CSS, JavaScript, HTML) via inline text, local file path, or URL.
 - Follow system theme e.g. [Mutagen](https://github.com/InioX/matugen), [Pywal](https://github.com/dylanaraps/pywal).
 
@@ -53,7 +53,7 @@ const theme = createTheme({
   // Overrides
   darkMode: systemTheme.darkMode,
   primary: systemTheme.primary
-  // ...more. TypeScript provides autocomplete
+  // ...more colors. TypeScript provides autocomplete
 })
 
 const vscodeTheme = createVsCodeTheme(theme)
@@ -94,14 +94,12 @@ body {
 ```
 
 ** Change background **<br>
-// todo:
+todo: add css
 
 ### Settings you might like
 
 ```json
 "editor.semanticHighlighting.enabled": true,
 "window.dialogStyle": "custom",
-"window.menuBarVisibility": "hidden" // I'm using command palette instead.
+"window.menuBarVisibility": "hidden" // Use command palette instead.
 ```
-
-My [settings.json](https://github.com/rakibdev/dotfiles/blob/main/home/rakib/.config/Code%20-%20Insiders/User/settings.json)
