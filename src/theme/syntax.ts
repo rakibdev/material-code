@@ -29,7 +29,12 @@ export const openSyntaxThemePicker = async () => {
     if (!item) return
     const selected = item.label.replace(icon, '').trim()
     const isDefault = selected.startsWith(packageJson.displayName)
-    await settings().update('syntaxTheme', isDefault ? undefined : selected, vscode.ConfigurationTarget.Global)
+    try {
+      await settings().update(settingKey, isDefault ? undefined : selected, vscode.ConfigurationTarget.Global)
+    } catch (error: any) {
+      // e.g. can't update when there are unsaved changes
+      errorNotification(error?.message)
+    }
     quickPick.hide()
   })
 
