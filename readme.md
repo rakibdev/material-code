@@ -25,7 +25,7 @@ And to revert run **Material Code: Remove styles**.
 
 ### Follow system theme
 
-Use node package for programmatic theme control outside VS Code.
+Use node package for full theme control outside VS Code.
 
 ```bash
 bun add https://github.com/rakibdev/material-code/releases/latest/download/npm.tgz
