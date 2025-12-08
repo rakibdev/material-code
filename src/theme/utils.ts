@@ -1,11 +1,24 @@
 import { dirname } from 'path'
 import * as vscode from 'vscode'
-import { createVsCodeTheme, themeOptions, type VsCodeTheme } from './create'
+import { createVsCodeTheme, themeOptions, createTheme, type Theme, type VsCodeTheme } from './create'
 import { settings } from '../utils/config'
 import { errorNotification } from '../utils/extension'
 import { readFile, writeFile } from '../utils/file'
 import { mergeSyntaxTheme } from './syntax'
-import { createTheme } from './create'
+
+type ColorsOverride = Record<string, string>
+
+const applyOverrides = (theme: Theme, overrides: ColorsOverride) => {
+  for (const key in overrides) {
+    const value = overrides[key]
+    if (key.startsWith('syntax.')) {
+      const syntaxKey = key.slice(7) as keyof Theme['syntax']
+      theme.syntax[syntaxKey] = value
+    } else {
+      ;(theme as any)[key] = value
+    }
+  }
+}
 
 export const getInstalledThemes = () => {
   const result: Record<string, { uri: vscode.Uri; uiTheme: string }> = {}
@@ -72,13 +85,17 @@ export const readTheme = async (uri: vscode.Uri, parent = {}) => {
 }
 
 export const saveTheme = async (uri: vscode.Uri, darkMode: boolean) => {
-  const options = {
+  const overrides = settings().get<ColorsOverride>('colors') || {}
+
+  const theme = createTheme({
     ...themeOptions,
     darkMode,
-    primary: settings().get<string>('primaryColor') || themeOptions.primary
-  }
+    primary: overrides.primary || themeOptions.primary,
+    error: overrides.error || themeOptions.error
+  })
+  applyOverrides(theme, overrides)
 
-  const theme = createVsCodeTheme(createTheme(options))
+  const vscodeTheme = createVsCodeTheme(theme)
 
   const name = settings().get<string>(darkMode ? 'syntaxTheme' : 'syntaxThemeLight')
   if (name) {
@@ -86,9 +103,9 @@ export const saveTheme = async (uri: vscode.Uri, darkMode: boolean) => {
     const sourceUri = themes[name]?.uri
     if (sourceUri) {
       const source = (await readTheme(sourceUri)) as VsCodeTheme
-      await mergeSyntaxTheme(theme, source)
+      await mergeSyntaxTheme(vscodeTheme, source)
     } else return errorNotification(`Syntax theme "${name}" not found.`)
   }
 
-  await writeFile(uri, JSON.stringify(theme))
+  await writeFile(uri, JSON.stringify(vscodeTheme))
 }

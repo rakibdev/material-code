@@ -1,9 +1,0 @@
-{
-  "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "emitDeclarationOnly": true,
-    "declarationDir": "../../build/npm",
-    "declaration": true
-  },
-  "include": ["../../src/theme/create.ts"]
-}

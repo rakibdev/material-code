@@ -35,7 +35,7 @@ export const activate = async (context: vscode.ExtensionContext) => {
 
   vscode.workspace.onDidChangeConfiguration(event => {
     if (
-      event.affectsConfiguration('material-code.primaryColor') ||
+      event.affectsConfiguration('material-code.colors') ||
       event.affectsConfiguration('material-code.syntaxTheme') ||
       event.affectsConfiguration('material-code.syntaxThemeLight')
     ) {

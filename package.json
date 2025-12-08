@@ -46,11 +46,82 @@
     "configuration": {
       "title": "Material Code",
       "properties": {
-        "material-code.primaryColor": {
-          "type": "string",
-          "default": "",
-          "pattern": "^(#([A-Fa-f0-9]{6})|)$",
-          "patternErrorMessage": "Invalid color."
+        "material-code.colors": {
+          "type": "object",
+          "default": {},
+          "markdownDescription": "Override theme colors",
+          "properties": {
+            "foreground": {
+              "type": "string"
+            },
+            "mutedForeground": {
+              "type": "string"
+            },
+            "background": {
+              "type": "string"
+            },
+            "card": {
+              "type": "string"
+            },
+            "popover": {
+              "type": "string"
+            },
+            "hover": {
+              "type": "string"
+            },
+            "border": {
+              "type": "string"
+            },
+            "primary": {
+              "type": "string"
+            },
+            "primaryForeground": {
+              "type": "string"
+            },
+            "secondary": {
+              "type": "string"
+            },
+            "secondaryForeground": {
+              "type": "string"
+            },
+            "error": {
+              "type": "string"
+            },
+            "errorForeground": {
+              "type": "string"
+            },
+            "success": {
+              "type": "string"
+            },
+            "warning": {
+              "type": "string"
+            },
+            "syntax.comment": {
+              "type": "string"
+            },
+            "syntax.string": {
+              "type": "string"
+            },
+            "syntax.keyword": {
+              "type": "string"
+            },
+            "syntax.variable": {
+              "type": "string"
+            },
+            "syntax.attribute": {
+              "type": "string"
+            },
+            "syntax.property": {
+              "type": "string"
+            },
+            "syntax.function": {
+              "type": "string"
+            },
+            "syntax.constant": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
         },
         "material-code.inject": {
           "type": "array",
@@ -95,7 +166,6 @@
   "scripts": {
     "dev": "export DEV=true && bun ./scripts/dev.ts",
     "build": "bun ./scripts/dev.ts && yes | vsce package --no-dependencies",
-    "build:npm": "bun ./scripts/npm/build.ts",
     "release": "bun ./scripts/release.ts && xdg-open https://marketplace.visualstudio.com/manage"
   },
   "dependencies": {

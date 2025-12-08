@@ -9,7 +9,7 @@
 - Click ripple effect.
 - Seperate syntax theming.
 - Inject custom code (CSS, JavaScript, HTML) via inline text, local file path, or URL.
-- Follow system theme e.g. [Mutagen](https://github.com/InioX/matugen), [Pywal](https://github.com/dylanaraps/pywal).
+- Follow system theme e.g. [Matugen](https://github.com/InioX/matugen), [Pywal](https://github.com/dylanaraps/pywal).
 
 Let me know your suggestions, issues on [Github](https://github.com/rakibdev/material-code/issues)
 
@@ -25,41 +25,50 @@ And to revert run **Material Code: Remove styles**.
 
 ### Follow system theme
 
-Use node package for full theme control outside VS Code.
+Use `material-code.colors` setting to override any color. Matugen can write to `settings.json` and vscode will update instantly.
 
-```bash
-bun add https://github.com/rakibdev/material-code/releases/latest/download/npm.tgz
+**Matugen**
+
+Create a template `~/.config/matugen/templates/vscode.json` (all fields optional):
+
+```json
+{
+  "material-code.colors": {
+    // Unset colors are derived from primary
+    "primary": "{{colors.primary.dark.hex}}",
+
+    "foreground": "",
+    "mutedForeground": "",
+    "background": "",
+    "card": "",
+    "popover": "",
+    "hover": "",
+    "border": "",
+    "primaryForeground": "",
+    "secondary": "",
+    "secondaryForeground": "",
+    "error": "",
+    "errorForeground": "",
+    "success": "",
+    "warning": "",
+    "syntax.comment": "",
+    "syntax.string": "",
+    "syntax.keyword": "",
+    "syntax.variable": "",
+    "syntax.attribute": "",
+    "syntax.property": "",
+    "syntax.function": "",
+    "syntax.constant": ""
+  }
+}
 ```
 
-You can automatically update VS Code theme whenever your system theme changes using script:
+Add to `~/.config/matugen/config.toml`:
 
-```typescript
-import { createTheme, createVsCodeTheme, themeOptions } from 'material-code/theme'
-import { readdir } from 'node:fs/promises'
-
-// I'm using custom color generator, not Pywal.
-const systemFile = Bun.env.HOME + '/.config/system-ui/app-data.json'
-const systemTheme = await Bun.file(systemFile).json()
-
-// Find installed extension folder
-const vscodeDir = Bun.env.HOME + '/.vscode-insiders/extensions/'
-const targetExtension = (await readdir(vscodeDir)).find(dir => dir.includes('material-code'))
-const extensionDir = vscodeDir + targetExtension + '/build'
-
-const theme = createTheme({
-  // Defaults
-  ...themeOptions,
-
-  // Overrides
-  darkMode: systemTheme.darkMode,
-  primary: systemTheme.primary
-  // ...more colors. TypeScript provides autocomplete
-})
-
-const vscodeTheme = createVsCodeTheme(theme)
-
-// Saving as dark variant
-await Bun.write(`${extensionDir}/dark.json`, JSON.stringify(vscodeTheme))
+```toml
+[templates.vscode]
+input_path = '~/.config/matugen/templates/vscode.json'
+output_path = '~/.config/Code/User/settings.json'
 ```
 
 ## Help
@@ -92,9 +101,6 @@ body {
   --radius: 8px;
 }
 ```
-
-** Change background **<br>
-todo: add css
 
 ### Settings you might like
 
