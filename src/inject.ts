@@ -67,8 +67,10 @@ const htmlWrapCode = (code: string) => {
   return `<${isCss ? 'style' : 'script'}>${code}</${isCss ? 'style' : 'script'}>`
 }
 
+const builtinInject = ['${extensionDir}/build/inject.css', '${extensionDir}/build/inject.js']
+
 export const applyStyles = async () => {
-  const inject = settings().get<string[]>('inject', [])
+  const inject = [...builtinInject, ...settings().get<string[]>('inject', [])]
   let code = ''
 
   for (const line of inject) {

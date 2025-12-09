@@ -128,11 +128,8 @@
           "items": {
             "type": "string"
           },
-          "default": [
-            "${extensionDir}/build/inject.css",
-            "${extensionDir}/build/inject.js"
-          ],
-          "markdownDescription": "Select **Command Palette > Material Code: Apply styles** after editing.\n\nExamples: \n* `~/Downloads/custom.css`\n* `C:/Users/rakib/Downloads/custom.css`\n* `https://raw.githubusercontent.com/.../custom.css`\n* `body { ... }`\n* `<style>...</style>`\n* `<script>...</script>`\n* `<div>...</div><style>...</style>`"
+          "default": [],
+          "markdownDescription": "Additional styles/scripts. Select **Command Palette > Material Code: Apply styles** after editing.\n\nExamples: \n* `~/Downloads/custom.css`\n* `C:/Users/rakib/Downloads/custom.css`\n* `https://raw.githubusercontent.com/.../custom.css`\n* `body { ... }`\n* `<style>...</style>`\n* `<script>...</script>`\n* `<div>...</div><style>...</style>`"
         },
         "material-code.syntaxTheme": {
           "type": "string",
