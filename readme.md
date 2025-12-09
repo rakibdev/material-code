@@ -31,7 +31,7 @@ Use `material-code.colors` setting to override any color. Matugen can write to `
 
 Create a template `~/.config/matugen/templates/vscode.json` (all fields optional):
 
-```json
+```jsonc
 {
   "material-code.colors": {
     // Unset colors are derived from primary
@@ -49,16 +49,29 @@ Create a template `~/.config/matugen/templates/vscode.json` (all fields optional
     "secondaryForeground": "",
     "error": "",
     "errorForeground": "",
+    // Success indicators, green terminal colors
     "success": "",
+    // Warning indicators, yellow terminal colors
     "warning": "",
     "syntax.comment": "",
     "syntax.string": "",
+    // Keywords, operators, control flow
     "syntax.keyword": "",
+    // Variables, tags, HTML elements
     "syntax.variable": "",
+    // HTML attributes, CSS selectors
     "syntax.attribute": "",
+    // Object properties, CSS properties
     "syntax.property": "",
+    // Functions, methods, CSS values
     "syntax.function": "",
-    "syntax.constant": ""
+    // Numbers, constants, types
+    "syntax.constant": "",
+    // Bracket pair colors
+    "syntax.bracket1": "",
+    "syntax.bracket2": "",
+    "syntax.bracket3": "",
+    "syntax.bracket4": ""
   }
 }
 ```
