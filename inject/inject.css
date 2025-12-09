@@ -16,6 +16,17 @@ body {
   border-radius: var(--radius) !important;
 }
 
+/* split button - round only outer edges */
+/* .empty = dropdown arrow hidden, so not a split button */
+.action-dropdown-item:not(.empty) > .action-dropdown, /* extensions page */
+.monaco-button-dropdown > .monaco-button:first-child { /* source control */
+  border-radius: var(--radius) 0 0 var(--radius) !important;
+}
+.action-dropdown-item > .monaco-dropdown .action-dropdown, /* extensions page */
+.monaco-button-dropdown > .monaco-dropdown-button { /* source control */
+  border-radius: 0 var(--radius) var(--radius) 0 !important;
+}
+
 .monaco-menu-container,
 .monaco-editor .suggest-widget, /* autocomplete */
 .quick-input-widget, /* command palette */
