@@ -2,7 +2,7 @@
   "name": "material-code",
   "displayName": "Material Code",
   "description": "Dynamic theme for Visual Studio Code.",
-  "version": "3.1.1",
+  "version": "3.1.0",
   "publisher": "rakib13332",
   "author": "https://github.com/rakibdev",
   "icon": "icon.png",
@@ -51,7 +51,7 @@
           "default": "",
           "pattern": "^(#([A-Fa-f0-9]{6})|)$",
           "patternErrorMessage": "Invalid color.",
-          "deprecationMessage": "Deprecated. Use material-code.colors.primary instead."
+          "markdownDescription": "**Deprecated.** Use `material-code.colors.primary` instead."
         },
         "material-code.colors": {
           "type": "object",
@@ -169,7 +169,7 @@
   },
   "scripts": {
     "dev": "export DEV=true && bun ./scripts/dev.ts",
-    "build": "bun ./scripts/dev.ts && yes | vsce package --no-dependencies",
+    "build": "bun ./scripts/dev.ts && yes | bun --bun node_modules/.bin/vsce package --no-dependencies",
     "release": "bun ./scripts/release.ts && xdg-open https://marketplace.visualstudio.com/manage"
   },
   "dependencies": {
