@@ -90,7 +90,7 @@ export const saveTheme = async (uri: vscode.Uri, darkMode: boolean) => {
   const theme = createTheme({
     ...themeOptions,
     darkMode,
-    primary: overrides.primary || themeOptions.primary,
+    primary: overrides.primary || settings().get<string>('primaryColor') || themeOptions.primary,
     error: overrides.error || themeOptions.error
   })
   applyOverrides(theme, overrides)

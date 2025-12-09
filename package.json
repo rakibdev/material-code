@@ -2,7 +2,7 @@
   "name": "material-code",
   "displayName": "Material Code",
   "description": "Dynamic theme for Visual Studio Code.",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "publisher": "rakib13332",
   "author": "https://github.com/rakibdev",
   "icon": "icon.png",
@@ -46,6 +46,13 @@
     "configuration": {
       "title": "Material Code",
       "properties": {
+        "material-code.primaryColor": {
+          "type": "string",
+          "default": "",
+          "pattern": "^(#([A-Fa-f0-9]{6})|)$",
+          "patternErrorMessage": "Invalid color.",
+          "deprecationMessage": "Deprecated. Use material-code.colors.primary instead."
+        },
         "material-code.colors": {
           "type": "object",
           "default": {},
