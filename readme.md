@@ -33,6 +33,7 @@ Create a template `~/.config/matugen/templates/vscode.json` (all fields optional
 
 ```jsonc
 {
+  ...
   "material-code.colors": {
     // Unset colors are derived from primary
     "primary": "{{colors.primary.dark.hex}}",
