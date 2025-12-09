@@ -36,18 +36,23 @@ Create a template `~/.config/matugen/templates/vscode.json` (all fields optional
   ...
   "material-code.colors": {
     // Unset colors are derived from primary
-    "primary": "{{colors.primary.dark.hex}}",
+    "primary": "{{colors.primary.default.hex}}",
 
-    "foreground": "",
-    "mutedForeground": "",
-    "background": "",
-    "card": "",
-    "popover": "",
-    "hover": "",
-    "border": "",
-    "primaryForeground": "",
-    "secondary": "",
-    "secondaryForeground": "",
+    "foreground": "{{colors.on_surface.default.hex}}",
+    "mutedForeground": "{{colors.on_surface_variant.default.hex}}",
+    "background": "{{colors.surface.default.hex}}",
+    // Elevated panel
+    "card": "{{colors.surface_container.default.hex}}",
+    // Dialog, dropdown
+    "popover": "{{colors.surface_container_high.default.hex}}",
+    // Hover, selected
+    "hover": "{{colors.surface_container_highest.default.hex}}",
+    // Input border, divider
+    "border": "{{colors.outline_variant.default.hex}}",
+    "primaryForeground": "{{colors.on_primary.default.hex}}",
+    // Tonal button, tooltip
+    "secondary": "{{colors.secondary_container.default.hex}}",
+    "secondaryForeground": "{{colors.on_secondary_container.default.hex}}",
     "error": "",
     "errorForeground": "",
     // Success indicators, green terminal colors
