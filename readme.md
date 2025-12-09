@@ -29,13 +29,13 @@ Use `material-code.colors` setting to override any color. Matugen can write to `
 
 **Matugen**
 
-Create a template `~/.config/matugen/templates/vscode.json` (all fields optional):
+Create a template `~/.config/matugen/templates/vscode.json`:
 
 ```jsonc
 {
   ...
   "material-code.colors": {
-    // Unset colors are derived from primary
+    // All fields are optional. Unset colors are derived from primary
     "primary": "{{colors.primary.default.hex}}",
 
     "foreground": "{{colors.on_surface.default.hex}}",
