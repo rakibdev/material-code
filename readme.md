@@ -1,5 +1,4 @@
 ![Material Code Editor](https://raw.githubusercontent.com/rakibdev/material-code/main/screenshots/editor.png)
-![Material Code Settings](https://raw.githubusercontent.com/rakibdev/material-code/main/screenshots/settings.png)
 ![Material Code Settings](https://raw.githubusercontent.com/rakibdev/material-code/main/screenshots/light-theme.png)
 
 ## Features
